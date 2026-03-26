@@ -178,6 +178,9 @@ merge_metadata[merge_metadata$ID == "MAV22", "Data_prelievo_T0"] <- as.Date("202
 merge_metadata$MEDAS[merge_metadata$ID %in% c("MAV10", "MAV19", "MAV21")] = NA
 merge_metadata$MEDAS = as.numeric(merge_metadata$MEDAS)
 
+#aggiungo colonna age_at_diagnosis
+merge_metadata$age_at_diagnosis <- interval(merge_metadata$Data_di_nascita, merge_metadata$Data_diagnosi) %/% years(1)
+
 #salvo il merge come csv
 write.csv(merge_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv", row.names = FALSE)
 
