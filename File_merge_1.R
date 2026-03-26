@@ -1,6 +1,6 @@
 library(readxl)
-metadata_pazienti_lesioni<- read_excel("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Imput/metadati_pazienti_Alessandro.xlsx")
-metadata_paper <- read.csv("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Imput/metadata_paper.csv")
+metadata_pazienti_lesioni<- read_excel("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/metadati_pazienti_Alessandro.xlsx")
+metadata_paper <- read.csv("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/metadata_paper.csv")
 dati_filtrati_pazienti <- metadata_pazienti_lesioni[startsWith(metadata_pazienti_lesioni$ID, "MAV"), ]
 #metto le date come date anno-mese-giorno
 str(dati_filtrati_pazienti)
@@ -177,4 +177,7 @@ merge_metadata[merge_metadata$ID == "MAV22", "Data_prelievo_T0"] <- as.Date("202
 #modifico il medas in modo che sia numerico (I tre trasformati in NA sono recuperabili dalla tabella originale, es. contattare madre)
 merge_metadata$MEDAS[merge_metadata$ID %in% c("MAV10", "MAV19", "MAV21")] = NA
 merge_metadata$MEDAS = as.numeric(merge_metadata$MEDAS)
+
+#salvo il merge come csv
+write.csv(merge_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv", row.names = FALSE)
 
