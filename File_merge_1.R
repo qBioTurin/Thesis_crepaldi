@@ -66,6 +66,7 @@ names(dati_filtrati_pazienti)[names(dati_filtrati_pazienti) == "nuova_TERAPIA"] 
 #-----------------------------------------
 #modifico metadata_paper
 names(metadata_paper)[names(metadata_paper) == "id"] <- "ID"
+names(metadata_paper)[names(metadata_paper) == "disease_actvity"] <- "disease_activity"
 #estraggo solo MAV
 metadata_MAV_paper <- metadata_paper[startsWith(metadata_paper$ID, "MAV"), ]
 str(metadata_MAV_paper)
@@ -78,12 +79,12 @@ metadata_MAV_paper$sex = factor(metadata_MAV_paper$sex, levels=c("M", "F"))
 metadata_MAV_paper$age= as.numeric(metadata_MAV_paper$age)
 metadata_MAV_paper$pyr_mds= as.numeric(metadata_MAV_paper$pyr_mds)
 metadata_MAV_paper$smoking_habit <- factor(metadata_MAV_paper$smoking_habit, levels = c("yes", "no"))
-metadata_MAV_paper$physical_activity= factor(metadata_MAV_paper$smoking_habit, levels = c( "active", "sedentary", "partially_active"))
+metadata_MAV_paper$physical_activity= factor(metadata_MAV_paper$physical_activity, levels = c( "active", "sedentary", "partially_active"))
 metadata_MAV_paper$antibiotic_use <- factor(metadata_MAV_paper$antibiotic_use, levels = c("yes", "no"))
 metadata_MAV_paper$sequencing_batch= as.numeric(metadata_MAV_paper$sequencing_batch)
 metadata_MAV_paper$spike_in <- factor(metadata_MAV_paper$spike_in, levels = c("yes", "no"))
 metadata_MAV_paper$glucocorticoid_treatment = factor(metadata_MAV_paper$glucocorticoid_treatment, levels = c("positive", "negative"))
-metadata_MAV_paper$disease_actvity= factor(metadata_MAV_paper$disease_actvity, levels = c("higher_activity", "lower_activity"))
+metadata_MAV_paper$disease_activity= factor(metadata_MAV_paper$disease_activity, levels = c("higher_activity", "lower_activity"))
 metadata_MAV_paper$gc_treatment = factor(metadata_MAV_paper$gc_treatment, levels = c("positive", "negative"))
 metadata_MAV_paper$days_gc_collection= as.numeric(metadata_MAV_paper$days_gc_collection)
 metadata_MAV_paper$lesion_burden= factor(metadata_MAV_paper$lesion_burden, levels= c("0", "1"))
@@ -147,16 +148,16 @@ merge_metadata[, c("ID", "sex")] #per controllare
 
 #completo la colonna age (at t0)
 merge_metadata$ID[is.na(merge_metadata$age)]
-merge_metadata[merge_metadata$ID == "MAV07", "age"] <- "42"
-merge_metadata[merge_metadata$ID == "MAV08", "age"] <- "36"
-merge_metadata[merge_metadata$ID == "MAV12", "age"] <- "36"
-merge_metadata[merge_metadata$ID == "MAV15", "age"] <- "48"
-merge_metadata[merge_metadata$ID == "MAV16", "age"] <- "55"
-merge_metadata[merge_metadata$ID == "MAV20", "age"] <- "49"
-merge_metadata[merge_metadata$ID == "MAV22", "age"] <- "39"
-merge_metadata[merge_metadata$ID == "MAV23", "age"] <- "52"
-merge_metadata[merge_metadata$ID == "MAV24", "age"] <- "35"
-merge_metadata[merge_metadata$ID == "MAV25", "age"] <- "42"
+merge_metadata[merge_metadata$ID == "MAV07", "age"] <- 42
+merge_metadata[merge_metadata$ID == "MAV08", "age"] <- 36
+merge_metadata[merge_metadata$ID == "MAV12", "age"] <- 36
+merge_metadata[merge_metadata$ID == "MAV15", "age"] <- 48
+merge_metadata[merge_metadata$ID == "MAV16", "age"] <- 55
+merge_metadata[merge_metadata$ID == "MAV20", "age"] <- 49
+merge_metadata[merge_metadata$ID == "MAV22", "age"] <- 39
+merge_metadata[merge_metadata$ID == "MAV23", "age"] <- 52
+merge_metadata[merge_metadata$ID == "MAV24", "age"] <- 35
+merge_metadata[merge_metadata$ID == "MAV25", "age"] <- 42
 
 #cambio nome alla colonna age in age_at_t0
 names(merge_metadata)[names(merge_metadata) == "age"] = "age_at_t0"
