@@ -163,10 +163,6 @@ merge_metadata[merge_metadata$ID == "MAV25", "age"] <- 42
 names(merge_metadata)[names(merge_metadata) == "age"] = "age_at_t0"
 merge_metadata$age_at_t0 = as.numeric(merge_metadata$age_at_t0)
 
-#creo la colonna age calcolata al giorno d'oggi
-library(lubridate)
-merge_metadata$age = floor(time_length(interval(as.Date(merge_metadata$Data_di_nascita), Sys.Date()), "years"))
-
 #completo la colonna naive
 merge_metadata$ID[is.na(merge_metadata$naive)]
 merge_metadata[merge_metadata$ID %in% c("MAV08", "MAV12", "MAV15", "MAV20","MAV24"), "naive"] <- "no"
@@ -179,9 +175,36 @@ merge_metadata[merge_metadata$ID == "MAV22", "Data_prelievo_T0"] <- as.Date("202
 merge_metadata$MEDAS[merge_metadata$ID %in% c("MAV10", "MAV19", "MAV21")] = NA
 merge_metadata$MEDAS = as.numeric(merge_metadata$MEDAS)
 
+
+#AGGIUNGO DATI TROVATI CON ALESSANDRO IN DATA 02/04
+merge_metadata[merge_metadata$ID == "MAV16", c("bmi", "smoking_habit", "physical_activity")] <- list(20.1, "yes", "partially_active")
+merge_metadata[merge_metadata$ID == "MAV12", c("bmi", "smoking_habit", "physical_activity")] <- list(20.3, "no", "partially_active")
+merge_metadata[merge_metadata$ID == "MAV15", c("bmi", "smoking_habit", "physical_activity")] <- list(32.0, "yes", "sedentary")
+
+#MAV DI ALTRI CENTRI
+merge_metadata[merge_metadata$ID == "MAV31", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-07-01"), "0", 2.5, 2.5,2.5, as.Date("2017-08-07"), as.Date("2017-12-15"), "negative")
+merge_metadata[merge_metadata$ID == "MAV31", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("1", "1", "1", "0", "sensoriale", "0", "1", "0", "0", "0", as.Date("1975-10-07"), "no", "Rebif", 46)
+
+merge_metadata[merge_metadata$ID == "MAV32", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-08-23"), "0", 4, 4,4, as.Date("2015-07-01"), as.Date("2016-07-01"), "negative")
+merge_metadata[merge_metadata$ID == "MAV32", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("1", "1", "0", "0", "tronco", "1", "0", "0", "0", "0", as.Date("1976-01-26"), "no", "Lemtrada", 45)
+
+merge_metadata[merge_metadata$ID == "MAV33", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-09-06"), "0", 2.5 , 2.5 ,2.5, as.Date("2021-02-15"), as.Date("2021-08-20"), "negative")
+merge_metadata[merge_metadata$ID == "MAV33", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "age_at_t0")] <- list("1", "1", "0", "0", "sensoriale", "1", "0", "0", "0", "0", as.Date("1998-11-09"), "yes", 22)
+
+merge_metadata[merge_metadata$ID == "MAV34", c("Data_prelievo_T0", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2022-04-19"), 2, 2,2, as.Date("2008-01-01"), as.Date("2019-11-01"), "positive")
+merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "age_at_t0")] <- list("0", "1", "0", "norb/sensoriale", "1", "0", "0", "0", "0", as.Date("1987-09-22"), 34)
+
+#creo la colonna age calcolata al giorno d'oggi
+library(lubridate)
+merge_metadata$age = floor(time_length(interval(as.Date(merge_metadata$Data_di_nascita), Sys.Date()), "years"))
+
 #aggiungo colonna age_at_diagnosis
 merge_metadata$age_at_diagnosis <- interval(merge_metadata$Data_di_nascita, merge_metadata$Data_diagnosi) %/% years(1)
+
+
+
 
 #salvo il merge come csv
 write.csv(merge_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv", row.names = FALSE)
 
+str(merge_metadata)
