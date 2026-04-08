@@ -40,6 +40,33 @@ t.test(EDSS_T24 ~ smoking_habit, data = merged_data) #differenza non significati
 t.test(EDSS_T30 ~ smoking_habit, data = merged_data) #differenza non significativa
 t.test(EDSS_T36 ~ smoking_habit, data = merged_data) #non ci sono abbastanza osservazioni
 
+library(ggplot2)
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T0, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T6, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T12, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T18, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T24, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T30, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+ggplot(merged_data, aes(x = smoking_habit, y = EDSS_T36, fill = smoking_habit)) + geom_boxplot(alpha = 0.8) + theme_minimal()
+
+#EDSS vs sex
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T0)), aes(x = sex, y = EDSS_T0, fill = sex)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T6)), aes(x = sex, y = EDSS_T6, fill = sex)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T12)), aes(x = sex, y = EDSS_T12, fill = sex)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T18)), aes(x = sex, y = EDSS_T18, fill = sex)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T24)), aes(x = sex, y = EDSS_T24, fill = sex)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T30)), aes(x = sex, y = EDSS_T30, fill = sex)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T36)), aes(x = sex, y = EDSS_T36, fill = sex)) + geom_boxplot() + theme_minimal()
+
+#EDSS vs physical_activity
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T0)), aes(x = physical_activity, y = EDSS_T0, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T6)), aes(x = physical_activity, y = EDSS_T6, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T12)), aes(x = physical_activity, y = EDSS_T12, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T18)), aes(x = physical_activity, y = EDSS_T18, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T24)), aes(x = physical_activity, y = EDSS_T24, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T30)), aes(x = physical_activity, y = EDSS_T30, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T36)), aes(x = physical_activity, y = EDSS_T36, fill = physical_activity)) + geom_boxplot() + theme_minimal()
+
 #EDSS vs age_at_diagnosis
 cor.test(merged_data$age_at_diagnosis, merged_data$EDSS_T0) #correlazione non significativa
 cor.test(merged_data$age_at_diagnosis, merged_data$EDSS_T6) #correlazione non significativa
@@ -48,6 +75,16 @@ cor.test(merged_data$age_at_diagnosis, merged_data$EDSS_T18) #correlazione non s
 cor.test(merged_data$age_at_diagnosis, merged_data$EDSS_T24) #correlazione positiva SIGNIFICATIVA
 cor.test(merged_data$age_at_diagnosis, merged_data$EDSS_T30) #correlazione non significativa
 cor.test(merged_data$age_at_diagnosis, merged_data$EDSS_T36) #correlazione non significativa
+
+#linee di regressione EDSS vs age_at_diagnosis
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T0)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T6)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T12)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T18)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T24)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T30)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = age_at_diagnosis, y = EDSS_T36)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+
 
 #EDSS vs bmi
 cor.test(merged_data$bmi, merged_data$EDSS_T0) #correlazione non significativa
@@ -58,6 +95,16 @@ cor.test(merged_data$bmi, merged_data$EDSS_T24) #correlazione non significativa
 cor.test(merged_data$bmi, merged_data$EDSS_T30) #correlazione non significativa
 cor.test(merged_data$bmi, merged_data$EDSS_T36) #correlazione non significativa
 
+#linee di regressione bmi vs EDSS
+ggplot(merged_data, aes(x = bmi, y = EDSS_T0)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = bmi, y = EDSS_T6)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = bmi, y = EDSS_T12)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = bmi, y = EDSS_T18)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = bmi, y = EDSS_T24)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = bmi, y = EDSS_T30)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = bmi, y = EDSS_T36)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+
+
 #EDSS vs MEDAS
 cor.test(merged_data$MEDAS, merged_data$EDSS_T0) #correlazione non significativa
 cor.test(merged_data$MEDAS, merged_data$EDSS_T6) #correlazione non significativa
@@ -67,9 +114,101 @@ cor.test(merged_data$MEDAS, merged_data$EDSS_T24) #correlazione non significativ
 cor.test(merged_data$MEDAS, merged_data$EDSS_T30) #correlazione non significativa
 cor.test(merged_data$MEDAS, merged_data$EDSS_T36) #non ci sono abbastanza osservazioni
 
+#linee di regressione EDSS vs MEDAS
+ggplot(merged_data, aes(x = EDSS_T0, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = EDSS_T6, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = EDSS_T12, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = EDSS_T18, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = EDSS_T24, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = EDSS_T30, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+ggplot(merged_data, aes(x = EDSS_T36, y = MEDAS)) +geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal()
+
 #age_at_diagnosis vs relapse
 t.test(age_at_diagnosis ~ relapse_T6, data = merged_data) #correlazione non significativa
 t.test(age_at_diagnosis ~ relapse_T24, data = merged_data) #correlazione non significativa
 t.test(age_at_diagnosis ~ relapse_T30, data = merged_data) #significativo
+
+#age_at_diagnosis vs lesions
+t.test(age_at_diagnosis ~ lesioni_T6, data=merged_data) #correlazione non significativa
+t.test(age_at_diagnosis ~ lesioni_T12, data=merged_data) #correlazione non significativa
+t.test(age_at_diagnosis ~ lesioni_T18, data=merged_data) #correlazione non significativa
+t.test(age_at_diagnosis ~ lesioni_T24, data=merged_data) #correlazione non significativa
+t.test(age_at_diagnosis ~ lesioni_T30, data=merged_data) #correlazione non significativa
+t.test(age_at_diagnosis ~ lesioni_T36, data=merged_data) #non ci sono abbastanza osservazioni
+
+#bmi vs relapse
+t.test(bmi ~ relapse_T6, data = merged_data) #correlazione non significativa
+t.test(bmi ~ relapse_T24, data = merged_data) #correlazione non significativa
+t.test(bmi ~ relapse_T30, data = merged_data) #correlazione non significativa
+
+#bmi vs new lesions
+t.test(bmi ~ lesioni_T6, data = merged_data) #correlazione non significativa
+t.test(bmi ~ lesioni_T12, data = merged_data) #correlazione non significativa
+t.test(bmi ~ lesioni_T18, data = merged_data) #correlazione non significativa
+t.test(bmi ~ lesioni_T24, data = merged_data) #correlazione non significativa
+t.test(bmi ~ lesioni_T30, data = merged_data) #correlazione non significativa
+
+
+#distribuzione di singole variabili con grafico
+
+#age_at_diagnosis
+ggplot(merged_data, aes(x = age_at_diagnosis)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(15, 60, 10)) + theme_minimal() + labs(title = "Distribution age_at_diagnosis", x = "age_at_diagnosis", y = "Frequency")
+
+#EDSS
+ggplot(merged_data, aes(x = EDSS_T0)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5)) + theme_minimal() + labs(title = "Distribution EDSS_T0", x = "EDSS_T0", y = "Frequency")
+ggplot(merged_data, aes(x = EDSS_T6)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5)) + theme_minimal() + labs(title = "Distribution EDSS_T6", x = "EDSS_T6", y = "Frequency")
+ggplot(merged_data, aes(x = EDSS_T12)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5)) + theme_minimal() + labs(title = "Distribution EDSS_T12",  x = "EDSS_T12",  y = "Frequency")
+ggplot(merged_data, aes(x = EDSS_T18)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5))+ theme_minimal() +  labs(title = "Distribution EDSS_T18",  x = "EDSS_T18", y = "Frequency")
+ggplot(merged_data, aes(x = EDSS_T24)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5))+ theme_minimal() + labs(title = "Distribution EDSS_T24", x = "EDSS_T24", y = "Frequency")
+ggplot(merged_data, aes(x = EDSS_T30)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5))+ theme_minimal() +  labs(title = "Distribution EDSS_T30", x = "EDSS_T30", y = "Frequency")
+ggplot(merged_data, aes(x = EDSS_T36)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(0, 10, 0.5)) + theme_minimal() + labs(title = "Distribution EDSS_T36", x = "EDSS_T36", y = "Frequency")
+
+
+#bmi
+ggplot(merged_data, aes(x = bmi)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(15, 35, 2))+ theme_minimal()
+
+#MEDAS
+ggplot(merged_data, aes(x = MEDAS)) + geom_histogram(binwidth = 0.5, fill = "#4C78A8",color = "white",linewidth = 0.4) + scale_x_continuous(breaks = seq(20, 100, 5))+ theme_minimal()
+
+#grafico andamento di alcune variabili
+#EDSS nel tempo
+plot(c(0, 6, 12, 18, 24, 30, 36), c(mean(merge_metadata$EDSS_T0, na.rm = TRUE), mean(merge_metadata$EDSS_T6, na.rm = TRUE),mean(merge_metadata$EDSS_T12, na.rm = TRUE),mean(merge_metadata$EDSS_T18, na.rm = TRUE),mean(merge_metadata$EDSS_T24, na.rm = TRUE),mean(merge_metadata$EDSS_T30, na.rm = TRUE), mean(merge_metadata$EDSS_T36, na.rm = TRUE)), type = "b", xlab = "Tempo", ylab = "EDSS_medio", main = "Andamento medio EDSS nel tempo")
+
+#grafico che associa EDSS nei vari time point e smoking habit
+library(dplyr)
+library(tidyr)
+
+edss_long <- merged_data %>%
+  select(ID, smoking_habit, EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T24, EDSS_T36) %>%
+  pivot_longer(cols = starts_with("EDSS"), names_to = "time", values_to = "EDSS") %>%
+  mutate(time = factor(time,levels = c("EDSS_T0", "EDSS_T6", "EDSS_T12", "EDSS_T24", "EDSS_T36")))
+
+ggplot(edss_long, aes(x = time, y = EDSS, color = smoking_habit, group = smoking_habit)) +stat_summary(fun = mean, geom = "line", linewidth = 1.2) + stat_summary(fun = mean, geom = "point", size = 3) +theme_minimal()
+
+#grafico che associa EDSS nei time point e sex
+edss_sex <- merged_data %>%
+  select(ID, sex, EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T24, EDSS_T36) %>%
+  pivot_longer(cols = starts_with("EDSS"), names_to = "time", values_to = "EDSS") %>%
+  mutate(time = factor(time,levels = c("EDSS_T0", "EDSS_T6", "EDSS_T12", "EDSS_T24", "EDSS_T36")))
+
+ggplot(edss_sex, aes(x = time, y = EDSS, color = sex, group = sex)) +stat_summary(fun = mean, geom = "line", linewidth = 1.2) + stat_summary(fun = mean, geom = "point", size = 3) +theme_minimal()
+
+#grafico che associa EDSS nei time point e naive
+edss_naive <- merged_data %>%
+  select(ID, naive, EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T24, EDSS_T36) %>%
+  pivot_longer(cols = starts_with("EDSS"), names_to = "time", values_to = "EDSS") %>%
+  mutate(time = factor(time,levels = c("EDSS_T0", "EDSS_T6", "EDSS_T12", "EDSS_T24", "EDSS_T36")))
+
+ggplot(edss_naive, aes(x = time, y = EDSS, color = naive, group = naive)) +stat_summary(fun = mean, geom = "line", linewidth = 1.2) + stat_summary(fun = mean, geom = "point", size = 3) +theme_minimal()
+
+#grafico che associa EDSS nei time point e physical_activity
+edss_activity <- merged_data %>%
+  select(ID, physical_activity, EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T24, EDSS_T36) %>%
+  pivot_longer(cols = starts_with("EDSS"), names_to = "time", values_to = "EDSS") %>%
+  mutate(time = factor(time,levels = c("EDSS_T0", "EDSS_T6", "EDSS_T12", "EDSS_T24", "EDSS_T36")))
+
+ggplot(edss_activity, aes(x = time, y = EDSS, color = physical_activity, group = physical_activity)) +stat_summary(fun = mean, geom = "line", linewidth = 1.2) + stat_summary(fun = mean, geom = "point", size = 3) +theme_minimal()
+
+
 
 
