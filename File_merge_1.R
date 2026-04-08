@@ -135,6 +135,7 @@ merge_metadata$center <- NULL
 
 #modifico MAV07 come non naive
 merge_metadata[merge_metadata$ID == "MAV07", "naive"] <- "no"
+merge_metadata[merge_metadata$ID == "MAV27", "naive"] <- "no"
 
 #modifico la colonna therapy completandola poichè ho solo MAV
 merge_metadata$therapy = "cladribine"
@@ -180,6 +181,9 @@ merge_metadata$MEDAS = as.numeric(merge_metadata$MEDAS)
 merge_metadata[merge_metadata$ID == "MAV16", c("bmi", "smoking_habit", "physical_activity")] <- list(20.1, "yes", "partially_active")
 merge_metadata[merge_metadata$ID == "MAV12", c("bmi", "smoking_habit", "physical_activity")] <- list(20.3, "no", "partially_active")
 merge_metadata[merge_metadata$ID == "MAV15", c("bmi", "smoking_habit", "physical_activity")] <- list(32.0, "yes", "sedentary")
+merge_metadata[merge_metadata$ID == "MAV25", c("bmi", "smoking_habit", "physical_activity")] <- list(25.7, "no", "sedentary")
+merge_metadata[merge_metadata$ID == "MAV22", "MEDAS"] <- 42
+
 
 #MAV DI ALTRI CENTRI
 merge_metadata[merge_metadata$ID == "MAV31", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-07-01"), "0", 2.5, 2.5,2.5, as.Date("2017-08-07"), as.Date("2017-12-15"), "negative")
