@@ -75,30 +75,9 @@ str(metadata_MAV_paper)
 metadata_MAV_paper$simplified_batch[metadata_MAV_paper$simplified_batch == "3-Jan"] <- "1-3"
 metadata_MAV_paper$simplified_batch[metadata_MAV_paper$simplified_batch == "5-Apr"] <- "4-5"
 metadata_MAV_paper$simplified_batch <- factor(metadata_MAV_paper$simplified_batch, levels = c("1-3", "4-5"))
-metadata_MAV_paper$naive <- factor(metadata_MAV_paper$naive, levels = c("yes", "no"))
 metadata_MAV_paper$sex <- factor(metadata_MAV_paper$sex, levels = c("M", "F"))
-metadata_MAV_paper$age <- as.numeric(metadata_MAV_paper$age)
-metadata_MAV_paper$pyr_mds <- as.numeric(metadata_MAV_paper$pyr_mds)
-metadata_MAV_paper$smoking_habit <- factor(metadata_MAV_paper$smoking_habit, levels = c("yes", "no"))
 metadata_MAV_paper$physical_activity <- factor(metadata_MAV_paper$physical_activity, levels = c("active", "sedentary", "partially_active"))
-metadata_MAV_paper$antibiotic_use <- factor(metadata_MAV_paper$antibiotic_use, levels = c("yes", "no"))
-metadata_MAV_paper$sequencing_batch <- as.numeric(metadata_MAV_paper$sequencing_batch)
-metadata_MAV_paper$spike_in <- factor(metadata_MAV_paper$spike_in, levels = c("yes", "no"))
-metadata_MAV_paper$glucocorticoid_treatment <- factor(metadata_MAV_paper$glucocorticoid_treatment, levels = c("positive", "negative"))
 metadata_MAV_paper$disease_activity <- factor(metadata_MAV_paper$disease_activity, levels = c("higher_activity", "lower_activity"))
-metadata_MAV_paper$gc_treatment <- factor(metadata_MAV_paper$gc_treatment, levels = c("positive", "negative"))
-metadata_MAV_paper$days_gc_collection <- as.numeric(metadata_MAV_paper$days_gc_collection)
-metadata_MAV_paper$lesion_burden <- factor(metadata_MAV_paper$lesion_burden, levels = c("0", "1"))
-metadata_MAV_paper$bone_marrow_lesions <- factor(metadata_MAV_paper$bone_marrow_lesions, levels = c("0", "1"))
-metadata_MAV_paper$subtentorial_lesions <- factor(metadata_MAV_paper$subtentorial_lesions, levels = c("0", "1"))
-metadata_MAV_paper$gadolinium_contrast <- factor(metadata_MAV_paper$gadolinium_contrast, levels = c("0", "1"))
-metadata_MAV_paper$full_recovery <- factor(metadata_MAV_paper$full_recovery, levels = c("0", "1"))
-metadata_MAV_paper$new_lesions_t12 <- factor(metadata_MAV_paper$new_lesions_t12, levels = c("0", "1"))
-metadata_MAV_paper$relapse_t12 <- factor(metadata_MAV_paper$relapse_t12, levels = c("0", "1"))
-metadata_MAV_paper$new_lesions_t24 <- factor(metadata_MAV_paper$new_lesions_t24, levels = c("0", "1"))
-metadata_MAV_paper$relapse_t24 <- factor(metadata_MAV_paper$relapse_t24, levels = c("0", "1"))
-metadata_MAV_paper$therapy_change <- factor(metadata_MAV_paper$therapy_change, levels = c("0", "1"))
-metadata_MAV_paper$prognosis_at_onset <- factor(metadata_MAV_paper$prognosis_at_onset, levels = c("positive", "negative"))
 
 ## DT: il codice va bene, ma si può scrivere in maniera più compatta usando tidyverse. ti faccio un esempio sotto:
 # metadata_MAV_paper <- metadata_MAV_paper %>%
@@ -129,6 +108,35 @@ metadata_MAV_paper$prognosis_at_onset <- factor(metadata_MAV_paper$prognosis_at_
 # ad esempio, se hai una colonna con "1" e "0", puoi trasformarla in un fattore con labels "Yes" e "No" in modo che appaia così nei grafici e nelle tabelle.
 
 
+#uso codice suggerito da Dora
+
+library(tidyverse)
+
+metadata_MAV_paper <- metadata_MAV_paper %>%
+  mutate(
+    across(c(age, pyr_mds, sequencing_batch, days_gc_collection),
+       as.numeric),
+    across(c(naive, smoking_habit, antibiotic_use, spike_in),
+     ~ factor(.x,
+       levels = c("yes", "no"),
+       labels = c("Yes", "No"))),
+    across(c(glucocorticoid_treatment, gc_treatment, prognosis_at_onset),
+         ~ factor(.x,
+           levels = c("positive", "negative"),
+           labels = c("Positive", "Negative"))),
+    across(c(lesion_burden, bone_marrow_lesions, subtentorial_lesions,
+        gadolinium_contrast, full_recovery,
+        new_lesions_t12, relapse_t12,
+        new_lesions_t24, relapse_t24,
+        therapy_change),
+       ~ factor(.x,
+            levels = c("0", "1"),
+            labels = c("No", "Yes")))
+ )
+
+
+
+
 str(metadata_MAV_paper)
 
 # cambio date con aa/m/gg
@@ -157,6 +165,21 @@ merge_metadata <- merge(dati_filtrati_pazienti, metadata_MAV_paper, by = "ID", a
 names(merge_metadata)
 str(merge_metadata)
 
+binary_cols_01 <- c(
+  "lesioni_T6", "relapse_T6", "lesioni_T12", "relapse_T12",
+  "lesioni_T18", "lesioni_T24", "relapse_T24",
+  "lesioni_T30", "relapse_T30",
+  "lesioni_T36", "relapse_T36",
+  "relapse_T18", "cambio_terapia"
+)
+
+merge_metadata[binary_cols_01] <- lapply(
+  merge_metadata[binary_cols_01],
+  function(x) factor(as.character(x),
+                     levels = c("0", "1"),
+                     labels = c("No", "Yes"))
+)
+
 # cambio glc_date
 merge_metadata$glc_date_before_t0 <- as.Date(merge_metadata$glc_date_before_t0, format = "%m/%d/%y")
 
@@ -164,8 +187,8 @@ merge_metadata$glc_date_before_t0 <- as.Date(merge_metadata$glc_date_before_t0, 
 merge_metadata$center <- NULL
 
 # modifico MAV07 come non naive
-merge_metadata[merge_metadata$ID == "MAV07", "naive"] <- "no"
-merge_metadata[merge_metadata$ID == "MAV27", "naive"] <- "no"
+merge_metadata[merge_metadata$ID == "MAV07", "naive"] <- "No"
+merge_metadata[merge_metadata$ID == "MAV27", "naive"] <- "No"
 
 # modifico la colonna therapy completandola poichè ho solo MAV
 merge_metadata$therapy <- "cladribine"
@@ -196,8 +219,9 @@ merge_metadata$age_at_t0 <- as.numeric(merge_metadata$age_at_t0)
 
 # completo la colonna naive
 merge_metadata$ID[is.na(merge_metadata$naive)]
-merge_metadata[merge_metadata$ID %in% c("MAV08", "MAV12", "MAV15", "MAV20", "MAV24"), "naive"] <- "no"
-merge_metadata[merge_metadata$ID %in% c("MAV16", "MAV22", "MAV23", "MAV25"), "naive"] <- "yes"
+merge_metadata[merge_metadata$ID %in% c("MAV08", "MAV12", "MAV15", "MAV20", "MAV24"), "naive"] <- "No"
+merge_metadata[merge_metadata$ID %in% c("MAV16", "MAV22", "MAV23", "MAV25"), "naive"] <- "Yes"
+
 
 # metto la data_t0 di MAV22 che ho trovato
 merge_metadata[merge_metadata$ID == "MAV22", "Data_prelievo_T0"] <- as.Date("2021-11-01")
@@ -208,25 +232,29 @@ merge_metadata$MEDAS <- as.numeric(merge_metadata$MEDAS)
 
 
 # AGGIUNGO DATI TROVATI CON ALESSANDRO IN DATA 02/04
-merge_metadata[merge_metadata$ID == "MAV16", c("bmi", "smoking_habit", "physical_activity")] <- list(20.1, "yes", "partially_active")
-merge_metadata[merge_metadata$ID == "MAV12", c("bmi", "smoking_habit", "physical_activity")] <- list(20.3, "no", "partially_active")
-merge_metadata[merge_metadata$ID == "MAV15", c("bmi", "smoking_habit", "physical_activity")] <- list(32.0, "yes", "sedentary")
-merge_metadata[merge_metadata$ID == "MAV25", c("bmi", "smoking_habit", "physical_activity")] <- list(25.7, "no", "sedentary")
+merge_metadata[merge_metadata$ID == "MAV16", c("bmi", "smoking_habit", "physical_activity")] <- list(20.1, "Yes", "partially_active")
+merge_metadata[merge_metadata$ID == "MAV12", c("bmi", "smoking_habit", "physical_activity")] <- list(20.3, "No", "partially_active")
+merge_metadata[merge_metadata$ID == "MAV15", c("bmi", "smoking_habit", "physical_activity")] <- list(32.0, "Yes", "sedentary")
+merge_metadata[merge_metadata$ID == "MAV25", c("bmi", "smoking_habit", "physical_activity")] <- list(25.7, "No", "sedentary")
 merge_metadata[merge_metadata$ID == "MAV22", "MEDAS"] <- 42
+merge_metadata[merge_metadata$ID == "MAV10", "MEDAS"] <- 35
+merge_metadata[merge_metadata$ID == "MAV21", "MEDAS"] <- 35
+merge_metadata[merge_metadata$ID == "MAV23", c("bmi", "smoking_habit", "physical_activity")] <- list(20.43, "No", "active")
 
 
 # MAV DI ALTRI CENTRI
-merge_metadata[merge_metadata$ID == "MAV31", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-07-01"), "0", 2.5, 2.5, 2.5, as.Date("2017-08-07"), as.Date("2017-12-15"), "negative")
-merge_metadata[merge_metadata$ID == "MAV31", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("1", "1", "1", "0", "sensoriale", "0", "1", "0", "0", "0", as.Date("1975-10-07"), "no", "Rebif", 46)
+merge_metadata[merge_metadata$ID == "MAV31", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-07-01"), "No", 2.5, 2.5, 2.5, as.Date("2017-08-07"), as.Date("2017-12-15"), "Negative", "No")
+merge_metadata[merge_metadata$ID == "MAV31", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("Yes", "Yes", "Yes", "No", "sensoriale", "No", "Yes", "No", "No", "No", as.Date("1975-10-07"), "No", "Rebif", 46)
 
-merge_metadata[merge_metadata$ID == "MAV32", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-08-23"), "0", 4, 4, 4, as.Date("2015-07-01"), as.Date("2016-07-01"), "negative")
-merge_metadata[merge_metadata$ID == "MAV32", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("1", "1", "0", "0", "tronco", "1", "0", "0", "0", "0", as.Date("1976-01-26"), "no", "Lemtrada", 45)
+merge_metadata[merge_metadata$ID == "MAV32", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-08-23"), "No", 4, 4, 4, as.Date("2015-07-01"), as.Date("2016-07-01"), "Negative", "Yes")
+merge_metadata[merge_metadata$ID == "MAV32", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("Yes", "Yes", "No", "No", "tronco", "Yes", "No", "No", "No", "No", as.Date("1976-01-26"), "No", "Lemtrada", 45)
 
-merge_metadata[merge_metadata$ID == "MAV33", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-09-06"), "0", 2.5, 2.5, 2.5, as.Date("2021-02-15"), as.Date("2021-08-20"), "negative")
-merge_metadata[merge_metadata$ID == "MAV33", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "age_at_t0")] <- list("1", "1", "0", "0", "sensoriale", "1", "0", "0", "0", "0", as.Date("1998-11-09"), "yes", 22)
+merge_metadata[merge_metadata$ID == "MAV33", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-09-06"), "No", 2.5, 2.5, 2.5, as.Date("2021-02-15"), as.Date("2021-08-20"), "Negative", "No")
+merge_metadata[merge_metadata$ID == "MAV33", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "age_at_t0")] <- list("Yes", "Yes", "No", "No", "sensoriale", "Yes", "No", "No", "No", "No", as.Date("1998-11-09"), "Yes", 22)
 
-merge_metadata[merge_metadata$ID == "MAV34", c("Data_prelievo_T0", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2022-04-19"), 2, 2, 2, as.Date("2008-01-01"), as.Date("2019-11-01"), "positive")
-merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "age_at_t0")] <- list("0", "1", "0", "norb/sensoriale", "1", "0", "0", "0", "0", as.Date("1987-09-22"), 34)
+merge_metadata[merge_metadata$ID == "MAV34", c("Data_prelievo_T0", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2022-04-19"), 2, 2, 2, as.Date("2008-01-01"), as.Date("2019-11-01"), "Positive")
+merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "age_at_t0")] <- list("No", "Yes", "No", "norb/sensoriale", "Yes", "No", "No", "No", "No", as.Date("1987-09-22"), 34)
+
 
 # creo la colonna age calcolata al giorno d'oggi
 library(lubridate)
