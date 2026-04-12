@@ -1,6 +1,10 @@
 # ANALISI METADATA INIZIALE
 # merged_data = read.csv("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv")
-merged_data <- read.csv("Input/merged_data.csv") # DT: dato che abbiamo la repo sincronizzata, puoi fare riferimento al path relativo, in modo che lo script funzioni indipendentemente da dove lo apri
+# merged_data <- read.csv("Input/merged_data.csv") # DT: dato che abbiamo la repo sincronizzata, puoi fare riferimento al path relativo, in modo che lo script funzioni indipendentemente da dove lo apri
+getwd()
+setwd("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi")
+merged_data <- read.csv("Input/merged_data.csv")
+
 str(merged_data)
 
 # metto a posto la tipologia di variabile di nuovo:
@@ -10,21 +14,30 @@ merged_data[cols_date] <- lapply(merged_data[cols_date], as.Date)
 
 # categorico
 cols_factor <- c("lesioni_T6", "relapse_T6", "lesioni_T12", "relapse_T12", "lesioni_T18", "relapse_T18", "lesioni_T24", "relapse_T24", "lesioni_T30", "relapse_T30", "lesioni_T36", "relapse_T36", "cambio_terapia", "lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "full_recovery")
-merged_data[cols_factor] <- lapply(merged_data[cols_factor], factor, levels = c(0, 1))
+merged_data[cols_factor] <- lapply(merged_data[cols_factor], factor, levels = c("No", "Yes"))
 cols_factor2 <- c("naive", "smoking_habit", "antibiotic_use", "spike_in")
-merged_data[cols_factor2] <- lapply(merged_data[cols_factor2], factor, levels = c("yes", "no"))
+merged_data[cols_factor2] <- lapply(merged_data[cols_factor2], factor, levels = c("Yes", "No"))
 cols_factor3 <- c("glucocorticoid_treatment", "gc_treatment", "prognosis_at_onset")
-merged_data[cols_factor3] <- lapply(merged_data[cols_factor3], factor, levels = c("positive", "negative"))
+merged_data[cols_factor3] <- lapply(merged_data[cols_factor3], factor, levels = c("Positive", "Negative"))
 merged_data$physical_activity <- factor(merged_data$physical_activity, levels = c("active", "sedentary", "partially_active"))
 merged_data$simplified_batch <- factor(merged_data$simplified_batch, levels = c("1-3", "4-5"))
 merged_data$disease_activity <- factor(merged_data$disease_activity, levels = c("higher_activity", "lower_activity"))
 merged_data$sex <- factor(merged_data$sex, levels = c("M", "F"))
 # DT: rendi factor anche EDSS, CENTRO, sequencing batch, clinical presentation
 
+merged_data$sequencing_batch <- factor(merged_data$sequencing_batch, levels = c("1", "2", "3"))
+merged_data$CENTRO <- factor(merged_data$CENTRO, levels = c("CLERICO", "NAPOLI", "MOLINETTE", "CRESM"))
+merged_data$clinical_presentation <- factor(merged_data$clinical_presentation)
+merged_data <- merged_data %>%
+  mutate(
+    across(starts_with("EDSS"), as.factor)
+  )
+
 # numerici
-cols_numeric <- c("MEDAS", "EDSS_T0", "EDSS_T6", "cortisone_T6", "EDSS_T12", "cortisone_T12", "EDSS_T18", "cortisone_T18", "EDSS_T24", "cortisone_T24", "EDSS_T30", "cortisone_T30", "EDSS_T36", "cortisone_T36", "age_at_t0", "bmi", "pyr_mds", "sequencing_batch", "dna_quantification", "days_gc_collection", "percent_th17", "treg_il10_pos", "treg_cd39_pos", "age", "age_at_diagnosis")
+cols_numeric <- c("MEDAS", "cortisone_T6", "cortisone_T12", "cortisone_T18", "cortisone_T24", "cortisone_T30", "cortisone_T36", "age_at_t0", "bmi", "pyr_mds", "dna_quantification", "days_gc_collection", "percent_th17", "treg_il10_pos", "treg_cd39_pos", "age", "age_at_diagnosis")
 merged_data[cols_numeric] <- lapply(merged_data[cols_numeric], as.numeric)
 
+#####Inizio analisi####
 # analisi esplorativa min,max, media, mediana di alcuni dati
 summary(merged_data[sapply(merged_data, is.numeric)])
 
@@ -308,6 +321,12 @@ ggplot(merged_data, aes(x = bmi)) +
   scale_x_continuous(breaks = seq(15, 35, 2)) +
   theme_minimal()
 # DT: per una variabile numerica continua come il BMI è meglio usare un boxplot per visualizzare la distribuzione; in alternativa puoi discretizzare il bmi in, ad esempio, tre classi (sottopeso, normopeso, sovrappeso/obeso) e vedere la frequenza con un grafico a barre
+ggplot(merged_data, aes(y = bmi)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Boxplot_BMI",y = "BMI",x = "")
+
+
 
 # MEDAS
 ggplot(merged_data, aes(x = MEDAS)) +
@@ -317,10 +336,7 @@ ggplot(merged_data, aes(x = MEDAS)) +
 
 # grafico andamento di alcune variabili
 # EDSS nel tempo
-plot(c(0, 6, 12, 18, 24, 30, 36), c(mean(merge_metadata$EDSS_T0, na.rm = TRUE), mean(merge_metadata$EDSS_T6, na.rm = TRUE), mean(merge_metadata$EDSS_T12, na.rm = TRUE), mean(merge_metadata$EDSS_T18, na.rm = TRUE), mean(merge_metadata$EDSS_T24, na.rm = TRUE), mean(merge_metadata$EDSS_T30, na.rm = TRUE), mean(merge_metadata$EDSS_T36, na.rm = TRUE)), type = "b", xlab = "Tempo", ylab = "EDSS_medio", main = "Andamento medio EDSS nel tempo")
-# DT: occhio che qui usi una variabile merge_metadata che però non è presente nello script. La richiami da un altro file? se sì, prima importa il file e poi richiami la variabile;
-# l'altra possibilità è che tu abbia questa variabile nell'environment da un'altra analisi: ricordati sempre di cancellare l'environment alla fine di ogni sessione R così non ti porti dietro errori.
-# l'ultima opzione è che in verità ti riferisci a merged_data
+plot(c(0, 6, 12, 18, 24, 30, 36), c(mean(merged_data$EDSS_T0, na.rm = TRUE), mean(merged_data$EDSS_T6, na.rm = TRUE), mean(merged_data$EDSS_T12, na.rm = TRUE), mean(merged_data$EDSS_T18, na.rm = TRUE), mean(merged_data$EDSS_T24, na.rm = TRUE), mean(merged_data$EDSS_T30, na.rm = TRUE), mean(merged_data$EDSS_T36, na.rm = TRUE)), type = "b", xlab = "Tempo", ylab = "EDSS_medio", main = "Andamento medio EDSS nel tempo")
 
 # grafico che associa EDSS nei vari time point e smoking habit
 library(dplyr)
