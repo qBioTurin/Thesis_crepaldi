@@ -1,6 +1,6 @@
-library(readxl)
-metadata_pazienti_lesioni <- read_excel("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/metadati_pazienti_Alessandro.xlsx")
-metadata_paper <- read.csv("C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/metadata_paper.csv")
+source("Libraries.R")
+metadata_pazienti_lesioni <- read_excel("Input/metadati_pazienti_Alessandro.xlsx")
+metadata_paper <- read.csv("Input/metadata_paper.csv")
 dati_filtrati_pazienti <- metadata_pazienti_lesioni[startsWith(metadata_pazienti_lesioni$ID, "MAV"), ]
 # metto le date come date anno-mese-giorno
 str(dati_filtrati_pazienti)
@@ -109,9 +109,6 @@ metadata_MAV_paper$disease_activity <- factor(metadata_MAV_paper$disease_activit
 
 
 #uso codice suggerito da Dora
-
-library(tidyverse)
-
 metadata_MAV_paper <- metadata_MAV_paper %>%
   mutate(
     across(c(age, pyr_mds, sequencing_batch, days_gc_collection),
@@ -143,8 +140,6 @@ str(metadata_MAV_paper)
 metadata_MAV_paper$sample_collection_date <- as.Date(metadata_MAV_paper$sample_collection_date, format = "%m/%d/%y")
 
 # elimino colonne doppie
-library(dplyr)
-
 metadata_MAV_paper <- metadata_MAV_paper %>%
   select(-c(
     X, category, edss, edss_t0, edss_t12, edss_t24,
@@ -257,7 +252,6 @@ merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_les
 
 
 # creo la colonna age calcolata al giorno d'oggi
-library(lubridate)
 merge_metadata$age <- floor(time_length(interval(as.Date(merge_metadata$Data_di_nascita), Sys.Date()), "years"))
 
 # aggiungo colonna age_at_diagnosis
