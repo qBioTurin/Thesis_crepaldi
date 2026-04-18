@@ -111,7 +111,7 @@ metadata_MAV_paper$disease_activity <- factor(metadata_MAV_paper$disease_activit
 #uso codice suggerito da Dora
 metadata_MAV_paper <- metadata_MAV_paper %>%
   mutate(
-    across(c(age, pyr_mds, sequencing_batch, days_gc_collection),
+    across(c(age, sequencing_batch, days_gc_collection),
        as.numeric),
     across(c(naive, smoking_habit, antibiotic_use, spike_in),
      ~ factor(.x,
@@ -146,7 +146,7 @@ metadata_MAV_paper <- metadata_MAV_paper %>%
     onset_date, diagnosis_date,
     new_lesions_t12, relapse_t12,
     new_lesions_t24, relapse_t24,
-    medas_percent, therapy_change
+    medas_percent, therapy_change, pyr_mds,center
   ))
 
 names(metadata_MAV_paper)
@@ -177,9 +177,6 @@ merge_metadata[binary_cols_01] <- lapply(
 
 # cambio glc_date
 merge_metadata$glc_date_before_t0 <- as.Date(merge_metadata$glc_date_before_t0, format = "%m/%d/%y")
-
-# tolgo colonna center che è doppia
-merge_metadata$center <- NULL
 
 # modifico MAV07 come non naive
 merge_metadata[merge_metadata$ID == "MAV07", "naive"] <- "No"
@@ -253,9 +250,6 @@ merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_les
 
 # creo la colonna age calcolata al giorno d'oggi
 merge_metadata$age <- floor(time_length(interval(as.Date(merge_metadata$Data_di_nascita), Sys.Date()), "years"))
-
-# aggiungo colonna age_at_diagnosis
-merge_metadata$age_at_diagnosis <- interval(merge_metadata$Data_di_nascita, merge_metadata$Data_diagnosi) %/% years(1)
 
 
 # salvo il merge come csv

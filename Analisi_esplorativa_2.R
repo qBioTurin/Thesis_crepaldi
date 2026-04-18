@@ -36,7 +36,7 @@ merged_data <- merged_data %>%
   )
 
 # numerici
-cols_numeric <- c("MEDAS", "cortisone_T6", "cortisone_T12", "cortisone_T18", "cortisone_T24", "cortisone_T30", "cortisone_T36", "age_at_t0", "bmi", "pyr_mds", "dna_quantification", "days_gc_collection", "percent_th17", "treg_il10_pos", "treg_cd39_pos", "age", "age_at_diagnosis")
+cols_numeric <- c("MEDAS", "cortisone_T6", "cortisone_T12", "cortisone_T18", "cortisone_T24", "cortisone_T30", "cortisone_T36", "age_at_t0", "bmi", "dna_quantification", "days_gc_collection", "percent_th17", "treg_il10_pos", "treg_cd39_pos", "age")
 merged_data[cols_numeric] <- lapply(merged_data[cols_numeric], as.numeric)
 
 #####Inizio analisi####
@@ -44,6 +44,15 @@ merged_data[cols_numeric] <- lapply(merged_data[cols_numeric], as.numeric)
 summary(merged_data[sapply(merged_data, is.numeric)])
 
 lapply(merged_data[sapply(merged_data, is.factor)], table, useNA = "always")
+
+#analisi NA globale
+na_count <- sapply(merged_data, function(x) sum(is.na(x)))
+na_percent <- sapply(merged_data, function(x) mean(is.na(x)) * 100)
+
+na_summary <- data.frame(variable = names(na_count), n_NA = na_count, perc_NA = round(na_percent, 2))
+na_summary[order(-na_summary$perc_NA), ]
+
+gg_miss_var(merged_data) + theme_minimal() + labs(title = "Missing values per variable")
 
 # analisi delle possibili correlazioni tra variabili:
 
@@ -64,6 +73,10 @@ ggplot(subset(merged_data, !is.na(smoking_habit) & !is.na(EDSS_T30)), aes(x = sm
 
 
 # EDSS vs sex
+wilcox.test(as.numeric(as.character(EDSS_T0)) ~ sex, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T12)) ~ sex, data = merged_data, exact = FALSE) # differenza non significativa
+
+
 ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T0)), aes(x = sex, as.numeric(as.character(EDSS_T0)), fill = sex)) +geom_boxplot() + theme_minimal() + labs(title = "EDSS vs Sex", x = "Sex", y = "EDSS_T0")
 ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T6)), aes(x = sex, as.numeric(as.character(EDSS_T6)), fill = sex)) +geom_boxplot() + theme_minimal() + labs(title = "EDSS vs Sex", x = "Sex", y = "EDSS_T6")
 ggplot(subset(merged_data, !is.na(sex) & !is.na(EDSS_T12)), aes(x = sex, as.numeric(as.character(EDSS_T12)), fill = sex)) +geom_boxplot() + theme_minimal() + labs(title = "EDSS vs Sex", x = "Sex", y = "EDSS_T12")
@@ -81,18 +94,18 @@ ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T24)), aes(x 
 ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T30)), aes(x = physical_activity, y = as.numeric(as.character(EDSS_T30)), fill = physical_activity)) + geom_boxplot() + theme_minimal() + labs(title = "EDSS vs Physical_activity", x = "Physical_activity", y = "EDSS_T30")
 
 
-# EDSS vs age_at_diagnosis
-cor.test(merged_data$age_at_diagnosis, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE) # non significativo
-cor.test(merged_data$age_at_diagnosis, as.numeric(merged_data$EDSS_T6), method = "spearman", exact = FALSE) # non significativo
-cor.test(merged_data$age_at_diagnosis, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE) # non significativo
-cor.test(merged_data$age_at_diagnosis, as.numeric(merged_data$EDSS_T18), method = "spearman", exact = FALSE) # non significativo
-cor.test(merged_data$age_at_diagnosis, as.numeric(merged_data$EDSS_T24), method = "spearman", exact = FALSE) #SIGNIFICATIVO
-cor.test(merged_data$age_at_diagnosis, as.numeric(merged_data$EDSS_T30), method = "spearman", exact = FALSE) #SIGNIFICATIVO
+# EDSS vs age_at_t0
+cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE) # non significativo
+cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T6), method = "spearman", exact = FALSE) # non significativo
+cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE) # non significativo
+cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T18), method = "spearman", exact = FALSE) # non significativo
+cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T24), method = "spearman", exact = FALSE) #SIGNIFICATIVO
+cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T30), method = "spearman", exact = FALSE) #SIGNIFICATIVO
 
-# linee di regressione EDSS vs age_at_diagnosis
-ggplot(merged_data, aes(x = age_at_diagnosis, y = as.numeric(as.character(EDSS_T0)))) + geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal() + labs(title = "EDSS vs Age at diagnosis", x = "Age_at_diagnosis", y = "EDSS_T0")
-ggplot(merged_data, aes(x = age_at_diagnosis, y = as.numeric(as.character(EDSS_T12)))) + geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal() + labs(title = "EDSS vs Age at diagnosis", x = "Age_at_diagnosis", y = "EDSS_T12")
-ggplot(merged_data, aes(x = age_at_diagnosis, y = as.numeric(as.character(EDSS_T24)))) + geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal() + labs(title = "EDSS vs Age at diagnosis", x = "Age_at_diagnosis", y = "EDSS_T24")
+# linee di regressione EDSS vs age_at_t0
+ggplot(merged_data, aes(x = age_at_t0, y = as.numeric(as.character(EDSS_T0)))) + geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal() + labs(title = "EDSS vs Age at T0", x = "Age_at_T0", y = "EDSS_T0")
+ggplot(merged_data, aes(x = age_at_t0, y = as.numeric(as.character(EDSS_T12)))) + geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal() + labs(title = "EDSS vs Age at T0", x = "Age_at_T0", y = "EDSS_T12")
+ggplot(merged_data, aes(x = age_at_t0, y = as.numeric(as.character(EDSS_T24)))) + geom_point(size = 3, alpha = 0.8) + geom_smooth(method = "lm", se = TRUE) + theme_minimal() + labs(title = "EDSS vs Age at T0", x = "Age_at_T0", y = "EDSS_T24")
 
 
 # EDSS vs bmi
@@ -188,7 +201,7 @@ ggplot(merged_data, aes(x = MEDAS_class)) + geom_bar(fill = "#4C78A8", color = "
 
 #preparo sottogruppo di dati per i grafici di andamento EDSS
 # DT: qui puoi migliorare il grafico modificando i livelli di Time con il numero del mese.
-#EDSS NEL TEMPO (non consider0 T36 perchè troppe poche osservazioni)
+#EDSS NEL TEMPO (non considero T36 perchè troppe poche osservazioni)
 edss_long <- merged_data %>%
   select(ID, smoking_habit, sex, naive, physical_activity, EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T18, EDSS_T24, EDSS_T30) %>%
   pivot_longer(cols = starts_with("EDSS"), names_to = "time", values_to = "EDSS_val") %>%
@@ -229,6 +242,11 @@ ggplot(edss_long, aes(x = time, y = EDSS_val, color = physical_activity, group =
 
 #analisi lesioni
 #lesion burden
+wilcox.test(as.numeric(as.character(EDSS_T0)) ~ lesion_burden, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T6)) ~ lesion_burden, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T12)) ~ lesion_burden, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T24)) ~ lesion_burden, data = merged_data, exact = FALSE) # differenza non significativa
+
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(lesion_burden)) %>%
   mutate(
@@ -239,6 +257,11 @@ merged_data %>%
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by lesion burden", x = "Lesion burden", y = "Percentage", fill = "EDSS")
 
 #Bone marrow lesions
+wilcox.test(as.numeric(as.character(EDSS_T0)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T6)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T12)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T24)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(bone_marrow_lesions)) %>%
   mutate(
@@ -249,6 +272,12 @@ merged_data %>%
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by bone marrow lesions", x = "Bone marrow lesions", y = "Percentage", fill = "EDSS")
 
 #subtentorial lesions
+wilcox.test(as.numeric(as.character(EDSS_T0)) ~ subtentorial_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T6)) ~ subtentorial_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T12)) ~ subtentorial_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T24)) ~ subtentorial_lesions, data = merged_data, exact = FALSE) # differenza non significativa
+
+
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(subtentorial_lesions)) %>%
   mutate(
@@ -259,6 +288,11 @@ merged_data %>%
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by subtentorial_lesions", x = "Subtentorial_lesions", y = "Percentage", fill = "EDSS")
 
 #gadolinium contrast
+wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gadolinium_contrast, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T6)) ~ gadolinium_contrast, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T12)) ~ gadolinium_contrast, data = merged_data, exact = FALSE) # differenza non significativa
+wilcox.test(as.numeric(as.character(EDSS_T24)) ~ gadolinium_contrast, data = merged_data, exact = FALSE) # differenza non significativa
+
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(gadolinium_contrast)) %>%
   mutate(
@@ -267,3 +301,31 @@ merged_data %>%
   ggplot(aes(x = gadolinium_contrast, fill = EDSS_T0)) +
   geom_bar(position = "fill") + scale_y_continuous(labels = scales::percent) +
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by gadolinium_contrast", x = "Gadolinium_contrast", y = "Percentage", fill = "EDSS")
+
+##relazioni tra categoriche##
+#relapse vs lesioni
+chisq.test(table(merged_data$relapse_T6, merged_data$lesioni_T6))
+chisq.test(table(merged_data$relapse_T18, merged_data$lesioni_T18))
+chisq.test(table(merged_data$relapse_T24, merged_data$lesioni_T24)) #significativo
+chisq.test(table(merged_data$relapse_T30, merged_data$lesioni_T30))
+
+ggplot(merged_data, aes(x = relapse_T6, fill = lesioni_T6)) + geom_bar(position = "fill") + theme_minimal() + labs(y = "Proportion")
+ggplot(merged_data, aes(x = relapse_T24, fill = lesioni_T24)) + geom_bar(position = "fill") + theme_minimal() + labs(y = "Proportion")
+
+# relapse vs gadolinium #no correlzione
+chisq.test(table(merged_data$relapse_T6, merged_data$gadolinium_contrast))
+chisq.test(table(merged_data$relapse_T30, merged_data$gadolinium_contrast))
+
+#naive vs relapse #no correlazione
+chisq.test(table(merged_data$naive, merged_data$relapse_T6))
+chisq.test(table(merged_data$naive, merged_data$relapse_T18))
+chisq.test(table(merged_data$naive, merged_data$relapse_T24))
+
+
+#glucocorticoid treatment before t0 e edss t0 #SIGNIFICATIVO
+wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gc_treatment, data = merged_data)
+
+ggplot(merged_data, aes(x = gc_treatment, y = as.numeric(as.character(EDSS_T0)))) + geom_boxplot() + theme_minimal()
+
+
+
