@@ -46,7 +46,7 @@ summary(merged_data)
 summary(as.numeric(merged_data$EDSS_T0))
 ```
 
-The cohort is composed by 30 patients affected by multiple sclerosis recruited from multiple centers (Clerico, Molinette, Napoli, Cresm).
+The cohort is composed by 30 patients affected by multiple sclerosis recruited from multiple centers (Clerico, Molinette, Napoli, CRESM).
 All of them were treated with cladribine (Mavenclad).
 The longitudinal clinical data were collected at 6-month time-points for 3 years.
 
@@ -56,13 +56,11 @@ Disease activity was predominantly classified as higher activity.
 Disability at baseline, measured by EDSS, showed generally low values reflected by a median of 3.0 and 26.7% of patients with a EDSS 1. 
 About treatment history, 18 patients (60.0%) were naive, while 11 (36.7%) had received prior therapies.
 Glucocorticoid treatment before T0 was reported in 12 patients (40.0%), whereas 6 patients (20.0%) had not received such treatment and data were missing for 12 subjects.
+
 Regarding lifestyle factors, the mean body mass index (BMI) was 23.54 ± 4.85, ranging from 16.80 to 32.10, with 9 missing values.
 Adherence to the Mediterranean diet, assessed by the MEDAS score (from 0 to 100), showed a mean value of 50.55 ± 15.18, with a wide range (35.00–85.70) and 8 missing observations.
 7 patients (23.3%) are smokers and 17 (56.7%) are non-smokers, with 6 missing values.
-Physical activity is heterogeneous distributed among the cohort with 5 (16.7%) patients classified as active, 7 (23.3%) as partially active and 9 (30%) as sedentary, with 9 missing values. 
-
-
-
+Physical activity is heterogeneous distributed among the cohort with 5 (16.7%) patients classified as active, 7 (23.3%) as partially active and 9 (30%) as sedentary, with 9 missing values.
 
 ```{r table, include=TRUE}
 
@@ -105,13 +103,13 @@ levels_df <- merged_data %>%
   )
 })
 
-tab_cat_final <- bind_rows(lista_cat)
+tab_cat <- bind_rows(lista_cat)
 
 #unione 
-table_1_final <- bind_rows(tab_num, tab_cat_final)
+summary_table <- bind_rows(tab_num, tab_cat)
 
 #visualizzazione nella parte di testo
-knitr::kable(table_1_final, booktabs = TRUE, longtable = TRUE)
+knitr::kable(summary_table, booktabs = TRUE, longtable = TRUE)
 
 ```
 
@@ -158,7 +156,7 @@ ggplot(merged_data, aes(x = EDSS_T36)) + geom_bar(fill = "#4C78A8", color = "whi
 ```
 
 Exploratory analysis of some relevant demographic variables:
-1. EDSS vs age at T0, positive and significant difference between groups only in T24 and T30 timepoints (we have to consider that these two time-points have a larger number of NA).
+1. EDSS and age at T0, positive and significant difference between groups only in T24 and T30 timepoints (we have to consider that these two time-points have a larger number of NA).
 ```{r age, include=TRUE}
 
 # EDSS vs age_at_t0
@@ -173,7 +171,7 @@ ggplot(merged_data, aes(x = age_at_t0, y = as.numeric(as.character(EDSS_T24)))) 
 
 ```
 
-2. EDSS vs sex, non-significant difference between groups at all time points.
+2. EDSS and sex, non-significant difference between groups at all time points.
 ```{r sex, include=TRUE}
 
 # EDSS vs sex ##correlazione non significativa in nessun timepoint
@@ -197,15 +195,15 @@ ggplot(merged_data, aes(x = bmi_class)) + geom_bar(fill = "#4C78A8", color = "wh
 
 ```
 
-1.1. EDSS vs BMI, non-significant difference between groups at all time points.
+1.1. EDSS and BMI, non-significant difference between groups at all time points.
 ```{r bmi, include=TRUE}
 # EDSS vs bmi
-cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE) # non significativo
-cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE) # non significativo
+cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE)
+cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE)
 
 ```
 
-2. EDSS vs smoking_habit, non-significant difference between groups at all time points.
+2. EDSS and smoking_habit, non-significant difference between groups at all time points.
 ```{r smoking, include=TRUE}
 
 # EDSS vs smoking_habit #correlazione non significativa in nessun timepoint
@@ -216,7 +214,7 @@ ggplot(subset(merged_data, !is.na(smoking_habit) & !is.na(EDSS_T0)), aes(x = smo
 
 ```
 
-3. EDSS vs physical_activity, a trend of relationship is observed between the sedentary lifestyle of patients and an increase in the disability index (EDSS).
+3. EDSS and physical_activity, a possible trend of relationship is observed between the sedentary lifestyle and an increase in the disability index (EDSS).
 ```{r activity, include=TRUE}
 ## EDSS vs physical_activity
 
@@ -251,17 +249,17 @@ merged_data$MEDAS_class <- factor(case_when(
 ggplot(merged_data, aes(x = MEDAS_class)) + geom_bar(fill = "#4C78A8", color = "white") + theme_minimal() + labs(title = "MEDAS adherence categories", x = "Adherence level", y = "Frequency")
 ```
 
-4.1. EDSS vs MEDAS, non-significant difference between groups at all time points.
+4.1. EDSS and MEDAS, non-significant difference between groups at all time points.
 ```{r medas, include=TRUE}
 
 # EDSS vs MEDAS
-cor.test(merged_data$MEDAS, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE) # non significativo
-cor.test(merged_data$MEDAS, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE) # non significativo
+cor.test(merged_data$MEDAS, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE) 
+cor.test(merged_data$MEDAS, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE)
 
 ```
 
 Exploratory analysis of some relevant clinical-radiological variables
-1. Age at T0 vs relapse, non-significant difference between groups at all time points.
+1. Age at T0 and relapse, non-significant difference between groups at all time points.
 ```{r relapse, include=TRUE}
 
 # age_at_t0 vs relapse
@@ -270,7 +268,7 @@ t.test(age_at_t0 ~ relapse_T24, data = merged_data)
 
 ```
 
-2. Age at T0 vs lesions, positive and significant difference between groups on T6 an T12.
+2. Age at T0 and lesions, positive and significant difference between groups on T6 an T12.
 ```{r lesions, include=TRUE}
 
 # age_at_t0 vs lesions
@@ -280,7 +278,7 @@ t.test(age_at_t0 ~ lesioni_T24, data = merged_data) # correlazione non significa
 
 ```
 
-3. EDSS vs lesion burden, non-significant difference between groups at all time points, but looking at the graph you can notice a trend of association of higher EDSS values to patients with lesions.
+3. EDSS and lesion burden, non-significant difference between groups at all time points, but looking at the graph you can notice a possible trend of association of higher EDSS values to patients with lesions.
 ```{r lesion burden, include=TRUE}
 
 #lesion burden
@@ -298,7 +296,7 @@ merged_data %>%
 
 ```
 
-4. EDSS vs bone marrow lesions, non-significant difference between groups at all time points, but looking at the graph you can notice a trend of association of higher EDSS values to patients with lesions.
+4. EDSS and bone marrow lesions, non-significant difference between groups at all time points, but looking at the graph you can notice a trend of association of higher EDSS values to patients with lesions.
 ```{r bone marrow lesions, include=TRUE}
 #Bone marrow lesions
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) 
@@ -315,7 +313,7 @@ merged_data %>%
 
 ```
 
-5. EDSS vs subtentorial lesions, non-significant difference between groups at all time points.
+5. EDSS and subtentorial lesions, non-significant difference between groups at all time points.
 ```{r subtentorial lesions, include=TRUE}
 
 #subtentorial lesions
@@ -324,7 +322,7 @@ wilcox.test(as.numeric(as.character(EDSS_T12)) ~ subtentorial_lesions, data = me
 
 ```
 
-6. EDSS vs gadolinium contrast, non-significant difference between groups at all time points.
+6. EDSS and gadolinium contrast, non-significant difference between groups at all time points.
 ```{r gadolinium contrast, include=TRUE}
 #gadolinium contrast
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gadolinium_contrast, data = merged_data, exact = FALSE)
@@ -332,11 +330,11 @@ wilcox.test(as.numeric(as.character(EDSS_T12)) ~ gadolinium_contrast, data = mer
 
 ```
 
-7. Glucocorticoid treatment before baseline vs EDSS, significant positive difference between groups in the T0 timepoint.
+7. Glucocorticoid treatment before baseline and EDSS, significant positive difference between groups in the T0 timepoint.
 ```{r gc treatment, include=TRUE}
 #glucocorticoid treatment before T0 e edss T0 #SIGNIFICATIVO
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gc_treatment, data = merged_data)
-ggplot(merged_data, aes(x = gc_treatment, y = as.numeric(as.character(EDSS_T0)))) + geom_boxplot() + theme_minimal()
+ggplot(merged_data, aes(x = gc_treatment, y = as.numeric(as.character(EDSS_T0)))) + geom_boxplot() + theme_minimal() + labs(title= "gc_treatment before T0", x= "gc_treatment", y="EDSS T0")
 
 ```
 
