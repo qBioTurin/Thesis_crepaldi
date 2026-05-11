@@ -7,7 +7,7 @@ output:
   html_document: default
 ---
 
-```{r}
+```{r data_import}
 knitr::opts_chunk$set(
   echo = TRUE, 
   warning = FALSE, 
@@ -36,7 +36,7 @@ merged_data <- merged_data %>%
     ) %>% factor(levels = c("No", "Yes"))))
 
 cols_factor2 <- c("glucocorticoid_treatment", "gc_treatment", "prognosis_at_onset")
-merged_data[cols_factor2] <- lapply(merged_data[cols_factor2], factor, levels = c("positive", "negative")) # DT qui i livelli erano maiuscoli e, dato che non matchavano, dava valori NA a tutto
+merged_data[cols_factor2] <- lapply(merged_data[cols_factor2], factor, levels = c("Positive", "Negative")) # DT qui i livelli erano maiuscoli e, dato che non matchavano, dava valori NA a tutto
 merged_data$physical_activity <- factor(merged_data$physical_activity, levels = c("active", "sedentary", "partially_active"))
 merged_data$simplified_batch <- factor(merged_data$simplified_batch, levels = c("1-3", "4-5"))
 merged_data$disease_activity <- factor(merged_data$disease_activity, levels = c("higher_activity", "lower_activity"))
@@ -58,7 +58,7 @@ merged_data$nuova_terapia <- gsub("[#$%&_]", " ", merged_data$nuova_terapia)
 merged_data$previous_therapy <- gsub("[#$%&_]", " ", merged_data$previous_therapy)
 ```
 
-```{r}
+```{r summary_data}
 summary(merged_data)
 ```
 
@@ -79,7 +79,7 @@ Adherence to the Mediterranean diet, assessed by the MEDAS score (from 0 to 100)
 7 patients (23.3%) are smokers and 17 (56.7%) are non-smokers, with 6 missing values.
 Physical activity is heterogeneously distributed among the cohort with 5 (16.7%) patients classified as active, 7 (23.3%) as partially active and 9 (30%) as sedentary, with 9 missing values.
 
-```{r}
+```{r summary_table}
 
 ####tabella riassuntiva
 #variabili numeriche
@@ -135,83 +135,95 @@ knitr::kable(summary_table, caption = "Cohort Summary Table")
 
 Summary graph of the distribution of the EDSS variable at time-point T0 in the cohort:
 
-```{r}
+```{r EDSS_T0}
 ggplot(merged_data, aes(x = EDSS_T0)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T0", x = "EDSS T0", y = "Frequency")
 ```
 
 
 Summary graph of the distribution of the EDSS variable at time-point T6 in the cohort:
 
-```{r}
+```{r EDSS T6}
 ggplot(merged_data, aes(x = EDSS_T6)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T6", x = "EDSS T6", y = "Frequency")
 ```
 
 
 Summary graph of the distribution of the EDSS variable at time-point T12 in the cohort:
 
-```{r}
+```{r EDSS T12}
 ggplot(merged_data, aes(x = EDSS_T12)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T12", x = "EDSS T12", y = "Frequency")
 ```
 
 
 Summary graph of the distribution of the EDSS variable at time-point T18 in the cohort:
 
-```{r}
+```{r EDSS T18}
 ggplot(merged_data, aes(x = EDSS_T18)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T18", x = "EDSS T18", y = "Frequency")
 ```
 
 
 Summary graph of the distribution of the EDSS variable at time-point T24 in the cohort:
 
-```{r}
+```{r EDSS T24}
 ggplot(merged_data, aes(x = EDSS_T24)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T24", x = "EDSS T24", y = "Frequency")
 ```
 
 
 Summary graph of the distribution of the EDSS variable at time-point T30 in the cohort:
 
-```{r}
+```{r EDSS T30}
 ggplot(merged_data, aes(x = EDSS_T30)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T30", x = "EDSS T30", y = "Frequency")
 ```
 
 
 Summary graph of the distribution of the EDSS variable at time-point T36 in the cohort:
 
-```{r}
+```{r EDSS T36}
 ggplot(merged_data, aes(x = EDSS_T36)) + geom_bar(fill = "#4C78A8", color = "white", linewidth = 0.4) + theme_minimal() + labs(title = "Distribution EDSS T36", x = "EDSS T36", y = "Frequency")
 ```
 
 Summary linepoint of the trend of the EDSS variable over time for each patient in the cohort:
-
 ```{r}
-
-#Preparazione dati
 edss_long <- merged_data %>%
   select(ID, starts_with("EDSS_T")) %>%
-  pivot_longer(cols = starts_with("EDSS_T"), names_to = "timepoint", values_to = "EDSS") %>%
+  pivot_longer(
+    cols = starts_with("EDSS_T"), 
+    names_to = "timepoint", 
+    values_to = "EDSS"
+  ) %>%
   filter(!is.na(EDSS)) %>%
   mutate(timepoint = factor(timepoint, 
                             levels = paste0("EDSS_T", c(0, 6, 12, 18, 24, 30, 36)),
                             labels = paste0("T", c(0, 6, 12, 18, 24, 30, 36))))
-
-#linepoint
+#creo grafico
 ggplot(edss_long, aes(x = timepoint, y = EDSS, group = ID)) +
-  #Linee pazienti
-  geom_line(aes(color = ID), alpha = 0.4, size = 0.5) + 
-  #jitter per più pazienti sullo stesso valore
-  geom_point(aes(color = ID), alpha = 0.4, size = 1.2, position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+  geom_line(aes(color = ID), alpha = 0.6, size = 0.6) + 
+  #jitter
+  geom_point(aes(color = ID), alpha = 0.6, size = 1.2, position = position_jitter(width = 0.1, height = 0, seed = 42)) +
+  #aggiungo etichette ID
+  geom_text_repel(data = edss_long %>% 
+      group_by(ID) %>% 
+      filter(as.numeric(timepoint) == max(as.numeric(timepoint))),
+    aes(label = ID, color = ID), size = 3, fontface = "bold", nudge_x = 0.2, segment.alpha = 0, show.legend = FALSE) +
   #Linea media
   stat_summary(aes(group = 1), fun = mean, geom = "line", size = 1.3, color = "black") +
-  stat_summary(aes(group = 1), fun = mean, geom = "point", size = 2.5, color = "black", shape = 18) + scale_color_viridis_d(guide = "none") + 
-  labs(title = "EDSS Progression Over Time", subtitle = "Black: cohort average | Coloured: each patient", x = "Timepoints", y = "EDSS value" ) + theme_minimal(base_size = 12) +
-  theme(panel.grid.minor = element_blank(), axis.title = element_text(face = "bold"), plot.title = element_text(face = "bold", size = 14), plot.subtitle = element_text(color = "grey30"))
+  stat_summary(aes(group = 1), fun = mean, geom = "point", size = 2.5, color = "black", shape = 18) + 
+  #correzione colori per averli più distinti
+  scale_color_manual(values = as.vector(pals::polychrome(length(unique(edss_long$ID)))), guide = "none") +
+  labs(title = "EDSS Progression Over Time", 
+       subtitle = "Black: cohort average | Coloured: each patient", 
+       x = "Timepoints", y = "EDSS value" ) + 
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(), 
+        axis.title = element_text(face = "bold"), 
+        plot.title = element_text(face = "bold", size = 14), 
+        plot.subtitle = element_text(color = "grey30"),
+        plot.margin = margin(10, 40, 10, 10)) #aggiungo spazio per gli ID
 ```
 
 
 Exploratory analysis of some relevant demographic variables:
 1. EDSS and age at T0, positive and significant difference between groups only in T24 and T30 time-points (we have to consider that these two time-points have a larger number of NA).
-
-```{r}
+```{r EDSS_vs_Age}
 
 # EDSS vs age_at_t0
 cor.test(merged_data$age_at_t0, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE) # non significativo
@@ -227,7 +239,7 @@ ggplot(merged_data, aes(x = age_at_t0, y = as.numeric(as.character(EDSS_T24)))) 
 
 2. EDSS and sex, non-significant difference between groups at all time points.
 
-```{r}
+```{r EDSS_vs_sex}
 
 # EDSS vs sex ##correlazione non significativa in nessun timepoint
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ sex, data = merged_data, exact = FALSE) # differenza non significativa
@@ -238,7 +250,7 @@ wilcox.test(as.numeric(as.character(EDSS_T12)) ~ sex, data = merged_data, exact 
 Exploratory analysis of some relevant lifestyle factors:
 1. Summary graph of the distribution of the BMI variable in the cohort:
 
-```{r}
+```{r BMI}
 merged_data$bmi_class <- factor(case_when(
     merged_data$bmi < 18.5 ~ "Underweight",
     merged_data$bmi >= 18.5 & merged_data$bmi < 25 ~ "Normal_weight",
@@ -253,7 +265,7 @@ ggplot(merged_data, aes(x = bmi_class)) + geom_bar(fill = "#4C78A8", color = "wh
 
 1.1. EDSS and BMI, non-significant difference between groups at all time points.
 
-```{r}
+```{r EDSS_vs_BMI}
 # EDSS vs bmi
 cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T0), method = "spearman", exact = FALSE)
 cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T12), method = "spearman", exact = FALSE)
@@ -262,7 +274,7 @@ cor.test(merged_data$bmi, as.numeric(merged_data$EDSS_T12), method = "spearman",
 
 2. EDSS and smoking habit, non-significant difference between groups at all time points.
 
-```{r}
+```{r EDSS_vs_smoking}
 
 # EDSS vs smoking_habit #correlazione non significativa in nessun timepoint
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ smoking_habit, data = merged_data, exact = FALSE) # differenza non significativa
@@ -274,7 +286,7 @@ ggplot(subset(merged_data, !is.na(smoking_habit) & !is.na(EDSS_T0)), aes(x = smo
 
 3. EDSS and physical activity, a possible trend can be seen in the graph between the sedentary lifestyle and an increase in the disability index (EDSS), but the statistical test is not significant.
 
-```{r}
+```{r EDSS_vs_physical_activity}
 ## EDSS vs physical_activity
 
 #T0
@@ -307,7 +319,7 @@ ggplot(edss_long, aes(x = time, y = EDSS_val, color = physical_activity, group =
 
 4. Summary graph of the distribution of the MEDAS variable in the cohort:
 
-```{r}
+```{r MEDAS}
 merged_data$MEDAS_class <- factor(case_when(
   merged_data$MEDAS < 40 ~ "Low_adherence",
   merged_data$MEDAS >= 40 & merged_data$MEDAS < 60 ~ "Moderate_adherence",
@@ -321,7 +333,7 @@ ggplot(merged_data, aes(x = MEDAS_class)) + geom_bar(fill = "#4C78A8", color = "
 
 4.1. EDSS and MEDAS, non-significant difference between groups at all time points.
 
-```{r}
+```{r EDSS_vs_MEDAS}
 
 # EDSS vs MEDAS
 kruskal.test(as.numeric(as.character(EDSS_T0)) ~ MEDAS, data = merged_data) 
@@ -334,7 +346,7 @@ kruskal.test(as.numeric(as.character(EDSS_T36)) ~ MEDAS, data = merged_data)
 Exploratory analysis of some relevant clinical-radiological variables
 1. Age at T0 and relapse, non-significant difference between groups at all time points.
 
-```{r}
+```{r age_vs_relapse}
 
 # age_at_t0 vs relapse
 t.test(age_at_t0 ~ relapse_T6, data = merged_data)
@@ -344,7 +356,7 @@ t.test(age_at_t0 ~ relapse_T24, data = merged_data)
 
 2. Age at T0 and lesions, positive and significant difference between groups on T6 an T12.
 
-```{r}
+```{r age_vs_lesions}
 
 # age_at_t0 vs lesions
 t.test(age_at_t0 ~ lesioni_T6, data = merged_data) # correlazione SIGNIFICATIVA (di poco)
@@ -355,7 +367,7 @@ t.test(age_at_t0 ~ lesioni_T24, data = merged_data) # correlazione non significa
 
 3. EDSS and lesion burden, non-significant difference between groups at all time points, but looking at the graph you can notice a possible trend of association of higher EDSS values to patients with lesions.
 
-```{r}
+```{r EDSS_vs_lesion_burden}
 
 #lesion burden
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ lesion_burden, data = merged_data, exact = FALSE) 
@@ -372,27 +384,26 @@ merged_data %>%
 ```
 
 
-4. EDSS and bone marrow lesions, non-significant difference between groups at all time points, but looking at the graph you can notice a trend of association of higher EDSS values to patients with lesions.
-
-```{r}
+4. EDSS and bone marrow lesions, the wilcox test shows a significant difference only at the time-point T12. All other time-points do not have a significant difference, but looking at the graph you can notice a trend of association of higher EDSS values to patients with lesions.
+```{r EDSS_vs_bone_marrow_lesions}
 #Bone marrow lesions
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) 
 wilcox.test(as.numeric(as.character(EDSS_T12)) ~ bone_marrow_lesions, data = merged_data, exact = FALSE) 
 
 merged_data %>%
-  filter(!is.na(EDSS_T0), !is.na(bone_marrow_lesions)) %>%
+  filter(!is.na(EDSS_T12), !is.na(bone_marrow_lesions)) %>%
   mutate(
-    EDSS_T0 = as.factor(EDSS_T0),
+    EDSS_T12 = as.factor(EDSS_T12),
     bone_marrow_lesions = factor(bone_marrow_lesions, labels = c("No", "Yes"))) %>%
-  ggplot(aes(x = bone_marrow_lesions, fill = EDSS_T0)) +
+  ggplot(aes(x = bone_marrow_lesions, fill = EDSS_T12)) +
   geom_bar(position = "fill") + scale_y_continuous(labels = scales::percent) +
-  scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS T0 by bone marrow lesions", x = "Bone marrow lesions", y = "Percentage", fill = "EDSS")
+  scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS T12 by bone marrow lesions", x = "Bone marrow lesions", y = "Percentage", fill = "EDSS")
 ```
 
 
 5. EDSS and subtentorial lesions, non-significant difference between groups at all time points.
 
-```{r}
+```{r EDSS_vs_subtentorial_lesions}
 
 #subtentorial lesions
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ subtentorial_lesions, data = merged_data, exact = FALSE)
@@ -402,7 +413,7 @@ wilcox.test(as.numeric(as.character(EDSS_T12)) ~ subtentorial_lesions, data = me
 
 6. EDSS and gadolinium contrast, non-significant difference between groups at all time points.
 
-```{r}
+```{r EDSS_vs_gadolinium_contrast}
 #gadolinium contrast
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gadolinium_contrast, data = merged_data, exact = FALSE)
 wilcox.test(as.numeric(as.character(EDSS_T12)) ~ gadolinium_contrast, data = merged_data, exact = FALSE)
@@ -411,11 +422,12 @@ wilcox.test(as.numeric(as.character(EDSS_T12)) ~ gadolinium_contrast, data = mer
 
 7. Glucocorticoid treatment before baseline and EDSS, significant positive difference between groups in the T0 timepoint.
 
-```{r}
+```{r EDSS_vs_gc_treatment}
 #glucocorticoid treatment before T0 e edss T0 #SIGNIFICATIVO
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gc_treatment, data = merged_data)
 ggplot(merged_data, aes(x = gc_treatment, y = as.numeric(as.character(EDSS_T0)))) + geom_boxplot() + theme_minimal() + labs(title= "Glucocorticoid treatment before T0", x= "gc treatment", y="EDSS T0")
 ```
 
-
-Overall, no statistically significant associations were observed between EDSS and most clinical or lifestyle variables across time points. Physical activity showed a potential trend, with more sedentary patients displaying higher EDSS values over time. Age at baseline was positively associated with EDSS only at later time points, although these results may be influenced by missing data.
+Overall, no statistically significant associations were observed between EDSS and most clinical or lifestyle variables across time points. Notably, a significant positive association was observed between EDSS and bone marrow lesions, specifically at the T12 time-point. Additionally, glucocorticoid treatment showed a significant positive difference between groups at T0.
+Regarding age, while age at baseline was generally associated with higher EDSS values at later stages, a specific positive and significant difference was found between age at T0 and the presence of lesions at both T6 and T12.
+Physical activity showed a potential trend, with more sedentary patients displaying a higher EDSS values over time, but the statistical tests are not significant. Although these results remain robust, it is important to consider that the findings at later time points may be partially influenced by missing data.
