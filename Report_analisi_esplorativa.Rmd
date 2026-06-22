@@ -67,7 +67,7 @@ The cohort is composed by 30 patients affected by multiple sclerosis recruited f
 All of them were treated with cladribine (Mavenclad).
 The longitudinal clinical data were collected at 6-month time-points for 3 years.
 
-The population is predominantly female, with 20 females (66.7%) and 9 males (30.0%).
+The population is predominantly female, with 21 females (70.0%) and 9 males (30.0%).
 At baseline (T0), the mean age was 37.37 years (± 9.89), with a median of 38.50 years, ranging from 20 to 55 years, indicating a relatively young cohort.
 Disease activity was predominantly classified as higher activity.
 Disability at baseline, measured by EDSS, showed generally low values reflected by a median of 1.5 and 26.7% of patients with a EDSS 1. 

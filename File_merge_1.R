@@ -188,7 +188,7 @@ merge_metadata$therapy <- "cladribine"
 # completo la colonna sex
 merge_metadata$ID[is.na(merge_metadata$sex)] # per sapere chi sono gli NA
 
-merge_metadata[merge_metadata$ID %in% c("MAV07", "MAV12", "MAV15", "MAV16", "MAV20", "MAV23", "MAV24", "MAV25", "MAV31"), "sex"] <- "F"
+merge_metadata[merge_metadata$ID %in% c("MAV07", "MAV12", "MAV15", "MAV16", "MAV20", "MAV23", "MAV24", "MAV25", "MAV31", "MAV34"), "sex"] <- "F"
 merge_metadata[merge_metadata$ID %in% c("MAV08", "MAV22"), "sex"] <- "M"
 merge_metadata[, c("ID", "sex")] # per controllare
 
