@@ -8,7 +8,7 @@ signifcant_dati <- read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\time_
 
 str(dati)
 
-#ho utilizzato or perchè altrimenti non ci sono corrispondenze con &
+#ho utilizzato | perchè altrimenti non ci sono corrispondenze con & 
 significant_result_tp <- dati %>%
   filter(metadata == "tp") %>%
   filter(pval_joint < 0.05 | qval_joint < 0.05)
