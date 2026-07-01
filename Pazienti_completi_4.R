@@ -7,6 +7,9 @@ batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx",skip = 1) %>%
   rename(id = ID)
 
 modified_metadata <- modified_metadata %>%
+  filter(!ID %in% c("MAV08", "MAV24"))
+
+modified_metadata <- modified_metadata %>%
   pivot_longer(
     cols = matches("^(EDSS|lesioni|relapse|cortisone)_"),
     names_to = c(".value", "tp"),
