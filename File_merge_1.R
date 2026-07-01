@@ -234,7 +234,10 @@ merge_metadata[merge_metadata$ID == "MAV21", "MEDAS"] <- 35
 merge_metadata[merge_metadata$ID == "MAV19", "MEDAS"] <- 35
 merge_metadata[merge_metadata$ID == "MAV23", c("bmi", "smoking_habit", "physical_activity")] <- list(20.43, "No", "active")
 
-
+### DA CONFERMARE!!!!! aggiungo dati nuovi da NAPOLI 
+merge_metadata <- merge_metadata %>%
+  mutate(across(c(cambio_terapia, starts_with("relapse_"), starts_with("lesioni_"), starts_with("cortisone_")),
+    ~ replace(.x, ID %in% c("MAV31", "MAV32", "MAV33"), "No")))
 # MAV DI ALTRI CENTRI
 merge_metadata[merge_metadata$ID == "MAV31", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-07-01"), "No", 2.5, 2.5, 2.5, as.Date("2017-08-07"), as.Date("2017-12-15"), "Negative", "No")
 merge_metadata[merge_metadata$ID == "MAV31", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("Yes", "Yes", "Yes", "No", "sensoriale", "No", "Yes", "No", "No", "No", as.Date("1975-10-07"), "No", "Rebif", 46)
@@ -256,4 +259,4 @@ merge_metadata$age <- floor(time_length(interval(as.Date(merge_metadata$Data_di_
 # salvo il merge come csv
 write.csv(merge_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv", row.names = FALSE)
 
-str(merge_metadata)
+

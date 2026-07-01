@@ -13,7 +13,7 @@ source("Libraries.R")
 # Create data for maaslin3
 main_el= "tp"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder= "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\time_MAV\\MAASLIN3"
+output_folder= "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin"
 
 #QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
 rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\time_MAV\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
