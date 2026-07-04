@@ -13,10 +13,10 @@ source("Libraries.R")
 # Create data for maaslin3
 main_el= "tp"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder= "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin"
+output_folder= "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\risultati_maaslin_eukaryota"
 
 #QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
-rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\time_MAV\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
+rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\shared_results_kraken_20260704_172753\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
 otu <- rds@otu_table
 taxa <- rds@tax_table
 metadata_df <- as(rds@sam_data, "data.frame")
@@ -39,7 +39,7 @@ merged_df <- merged_df %>% select(-c(taxid, Genus_Species))
 merged_df <- t(merged_df)
 
 metadata_df$tp =as.factor(metadata_df$tp)
-levels(metadata_df$tp) = c("T0", "T3", "T12")
+levels(metadata_df$tp) = c("T0", "T3", "T12", "T15", "T24", "36")
 metadata_df$sex = as.factor(metadata_df$sex)
 levels(metadata_df$sex) = c("M", "F")
 metadata_df$lesioni =as.factor(metadata_df$lesioni)
@@ -100,3 +100,4 @@ fit_out <- maaslin3(
   # pval_filter = 0.05,
   cores = 1
 )
+

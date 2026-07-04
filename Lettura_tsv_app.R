@@ -12,25 +12,33 @@ significant_result_tp <- dati %>%
   filter(pval_individual < 0.05 | qval_individual < 0.05)
 
 
-######risultati con pazienti totali
+
+######risultati con pazienti totali#####
 #batteri
-all_definitive_bacteria = read.delim("")
-significant_bacteria <- all_definitive_bacteria %>%
-  filter(metadata == "tp") %>%
-  filter(pval_individual < 0.05 | qval_individual < 0.05)
+all_definitive_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\risultati_maaslin_bacteria\\all_results.tsv")
+
+significant_bacteria_prevalence <- all_definitive_bacteria %>%
+  filter(model == "prevalence", metadata == "tp",
+    pval_individual < 0.05 | qval_individual < 0.05)
+
+significant_bacteria_abundance <- all_definitive_bacteria %>%
+  filter(model == "abundance", metadata == "tp",
+    pval_individual < 0.05 | qval_individual < 0.05)
 
 
-#archea
-all_definitive_archea = read.delim("")
-significant_archea <- all_definitive_archea %>%
-  filter(metadata == "tp") %>%
-  filter(pval_individual < 0.05 | qval_individual < 0.05)
+
 
 #eukarioti
-all_definitive_eukariota = read.delim("")
-significant_eukariota <- all_definitive_eukariota %>%
-  filter(metadata == "tp") %>%
-  filter(pval_individual < 0.05 | qval_individual < 0.05)
+all_definitive_eukaryota = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\risultati_maaslin_eukaryota\\all_results.tsv")
+
+significant_eukaryota_prevalence <- all_definitive_eukaryota %>%
+  filter(model == "prevalence", metadata == "tp",
+         pval_individual < 0.05 | qval_individual < 0.05)
+
+significant_eukaryota_abundance <- all_definitive_eukaryota %>%
+  filter(model == "abundance", metadata == "tp",
+         pval_individual < 0.05 | qval_individual < 0.05)
+
 
 
 

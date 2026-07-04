@@ -47,9 +47,8 @@ modified_metadata <- modified_metadata %>%
   select(id, everything()) %>%
   select(where(~ !all(is.na(.)))) %>%
   select(-sequencing_batch) %>%
-  left_join(batch_data, by = "id")
-
+  left_join(batch_data, by = "id")%>%
+  filter(!is.na(sequencing_batch))
 
 write.csv(modified_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/modified_metadata.csv", row.names = FALSE)
-
 
