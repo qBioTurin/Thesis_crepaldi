@@ -232,6 +232,8 @@ merge_metadata[merge_metadata$ID == "MAV22", "MEDAS"] <- 42
 merge_metadata[merge_metadata$ID == "MAV10", "MEDAS"] <- 35
 merge_metadata[merge_metadata$ID == "MAV21", "MEDAS"] <- 35
 merge_metadata[merge_metadata$ID == "MAV19", "MEDAS"] <- 35
+merge_metadata[merge_metadata$ID == "MAV31", "MEDAS"] <- 57
+
 merge_metadata[merge_metadata$ID == "MAV23", c("bmi", "smoking_habit", "physical_activity")] <- list(20.43, "No", "active")
 
 ### DA CONFERMARE!!!!! aggiungo dati nuovi da NAPOLI 

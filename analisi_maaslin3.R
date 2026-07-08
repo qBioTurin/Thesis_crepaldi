@@ -9,17 +9,17 @@
 
 
 source("Libraries.R")
-#QUI CAMBIA IL MAIN EL E I CONFUNDERS SE MI SERVE
-# Create data for maaslin3
 main_el= "tp"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder= "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\risultati_maaslin_eukaryota"
+output_folder= "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\risultati_maaslin_bacteria"
 
 #QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
-rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\shared_results_kraken_20260704_172753\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
+rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
 otu <- rds@otu_table
 taxa <- rds@tax_table
 metadata_df <- as(rds@sam_data, "data.frame")
+unique(metadata_df$tp)
+
 
 taxa <- as.data.frame(taxa)
 taxa$Genus_Species <- paste(taxa$Genus, taxa$Species, sep = "_")
@@ -38,8 +38,12 @@ rownames(merged_df) <- merged_df$Genus_Species
 merged_df <- merged_df %>% select(-c(taxid, Genus_Species))
 merged_df <- t(merged_df)
 
-metadata_df$tp =as.factor(metadata_df$tp)
-levels(metadata_df$tp) = c("T0", "T3", "T12", "T15", "T24", "36")
+metadata_df$tp <- factor(
+  as.character(metadata_df$tp),
+  levels = c("T0", "T3", "T12", "T15", "T24", "T36"),
+  ordered = FALSE
+)
+unique(metadata_df$tp)
 metadata_df$sex = as.factor(metadata_df$sex)
 levels(metadata_df$sex) = c("M", "F")
 metadata_df$lesioni =as.factor(metadata_df$lesioni)
@@ -50,11 +54,8 @@ levels(metadata_df$relapse) = c("Yes", "No")
 if (!dir.exists(output_folder)) {
   dir.create(output_folder, recursive = TRUE)
 }
-# el_plot <- levels(metadata_df[[main_el]])[1]
-el_plot2 <- levels(metadata_df[[main_el]])[2]
-# main_el_plot <- paste(main_el, el_plot)
-second_el_plot <- paste(main_el, el_plot2)
-coef_plot_vars <- c(second_el_plot)
+
+coef_plot_vars <- c("tp T3", "tp T12", "tp T15", "tp T24", "tp T36")
 
 discr_els_formatted <- unlist(lapply(confunders, function(d) {
   if (is.factor(metadata_df[[d]])) {
@@ -69,11 +70,10 @@ formulaInUse_fin = paste0("~ ",formulaInUse, "+(1|original)")
 set.seed(2204)
 median_comparison_abundance_in = FALSE
 fx_effects = NULL
-random_effects = NULL
+random_effects =  NULL
 group_effects = NULL
 ordered_effects = NULL
 strata_effects = NULL
-heatmap_vars = NULL
 Sys.setenv(OMP_NUM_THREADS=1, MKL_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1)
 fit_out <- maaslin3(
   input_data = merged_df,
@@ -82,16 +82,17 @@ fit_out <- maaslin3(
   formula = formulaInUse_fin,
   fixed_effects = fx_effects,
   plot_summary_plot = TRUE,
+  reference = c('tp,T0'),
+  standardize= TRUE,#o continuous guardare se standardizzare o meno le variabili continue
   coef_plot_vars = coef_plot_vars,
-  heatmap_vars = heatmap_vars,
   random_effects = random_effects,
   group_effects = group_effects,
   ordered_effects = ordered_effects,
   strata_effects = strata_effects,
   normalization = "TSS",
+  heatmap_vars = c("tp T3", "tp T12", "tp T15", "tp T24", "tp T36", "sex F", "bmi", "age_at_t0"),
   transform = "LOG",
   augment = TRUE,
-  standardize = TRUE,
   max_significance = 0.1,
   median_comparison_abundance = median_comparison_abundance_in,
   median_comparison_prevalence = FALSE,
@@ -100,4 +101,3 @@ fit_out <- maaslin3(
   # pval_filter = 0.05,
   cores = 1
 )
-

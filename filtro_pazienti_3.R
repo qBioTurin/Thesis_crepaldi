@@ -5,6 +5,7 @@ merged_data <- read.csv("Input/merged_data.csv")
 batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx",skip = 1) %>%
   select(ID, sequencing_batch) %>%
   rename(id = ID)
+batch_data$id[batch_data$id == "MAV5T15"] <- "MAV05T15"
 
 filtered_patients <- merged_data %>%
   filter(ID %in% c("MAV05", "MAV07", "MAV09", "MAV11", "MAV13", "MAV14", "MAV34")) %>%

@@ -210,7 +210,7 @@ ggplot(edss_long, aes(x = timepoint, y = EDSS, group = ID)) +
   #correzione colori per averli più distinti
   scale_color_manual(values = as.vector(pals::polychrome(length(unique(edss_long$ID)))), guide = "none") +
   labs(title = "EDSS Progression Over Time", 
-       subtitle = "Black: cohort average | Coloured: each patient", 
+       subtitle = "Black: cohort average | Coloured: each MAV patient", 
        x = "Timepoints", y = "EDSS value" ) + 
   theme_minimal(base_size = 12) +
   theme(panel.grid.minor = element_blank(), 
