@@ -16,11 +16,12 @@ modified_metadata <- modified_metadata %>%
     names_to = c(".value", "tp"),
     names_sep = "_"
   ) %>%
-  filter(tp %in% c("T0", "T12", "T24", "T36")) %>%
+  filter(tp %in% c("T0", "T6", "T12", "T18", "T24", "T36")) %>%
   bind_rows(
-    filter(., tp == "T0") %>% mutate(tp = "T3"),
-    filter(., tp == "T12") %>% mutate(tp = "T15")
+    filter(., tp == "T6") %>% mutate(tp = "T3"),
+    filter(., tp == "T18") %>% mutate(tp = "T15")
   ) %>%
+  filter(!tp %in% c("T6", "T18")) %>%   # rimuove T6 e T18
   mutate(tp = factor(tp, levels = c("T0", "T3", "T12", "T15", "T24", "T36"))) %>%
   arrange(ID, tp) %>%
   group_by(ID) %>%
@@ -48,9 +49,12 @@ modified_metadata <- modified_metadata %>%
   select(id, everything()) %>%
   select(where(~ !all(is.na(.)))) %>%
   select(-sequencing_batch) %>%
-  left_join(batch_data, by = "id")%>%
+  left_join(batch_data, by = "id") %>%
   filter(!is.na(sequencing_batch))
 
+
+
+#mettere in ordine nei grafici app
 modified_metadata$id <- replace(
   modified_metadata$id,
   modified_metadata$id %in% c("MAV05T3","MAV07T3","MAV09T3","MAV11T3","MAV13T3","MAV14T3","MAV17T3","MAV18T3","MAV23T3","MAV26T3","MAV27T3","MAV28T3","MAV29T3","MAV30T3","MAV31T3","MAV32T3","MAV34T3"),

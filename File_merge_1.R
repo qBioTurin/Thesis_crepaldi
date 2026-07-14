@@ -180,7 +180,7 @@ merge_metadata$glc_date_before_t0 <- as.Date(merge_metadata$glc_date_before_t0, 
 
 # modifico MAV07 come non naive
 merge_metadata[merge_metadata$ID == "MAV07", "naive"] <- "No"
-merge_metadata[merge_metadata$ID == "MAV27", "naive"] <- "No"
+
 
 # modifico la colonna therapy completandola poichè ho solo MAV
 merge_metadata$therapy <- "cladribine"
@@ -212,7 +212,7 @@ merge_metadata$age_at_t0 <- as.numeric(merge_metadata$age_at_t0)
 # completo la colonna naive
 merge_metadata$ID[is.na(merge_metadata$naive)]
 merge_metadata[merge_metadata$ID %in% c("MAV08", "MAV12", "MAV15", "MAV20", "MAV24"), "naive"] <- "No"
-merge_metadata[merge_metadata$ID %in% c("MAV16", "MAV22", "MAV23", "MAV25"), "naive"] <- "Yes"
+merge_metadata[merge_metadata$ID %in% c("MAV16", "MAV22", "MAV23"), "naive"] <- "No"
 
 
 # metto la data_t0 di MAV22 che ho trovato
@@ -238,17 +238,31 @@ merge_metadata[merge_metadata$ID == "MAV23", c("bmi", "smoking_habit", "physical
 
 ### DA CONFERMARE!!!!! aggiungo dati nuovi da NAPOLI 
 merge_metadata <- merge_metadata %>%
-  mutate(across(c(cambio_terapia, starts_with("relapse_"), starts_with("lesioni_"), starts_with("cortisone_")),
-    ~ replace(.x, ID %in% c("MAV31", "MAV32", "MAV33"), "No")))
+  mutate(
+    across(
+      c("cambio_terapia", starts_with("relapse_"), starts_with("lesioni_")),
+      ~ replace(.x, ID %in% c("MAV31", "MAV32", "MAV33") & is.na(.x), "No")
+    )
+  )
+
+merge_metadata <- merge_metadata %>%
+  mutate(
+    across(
+      starts_with("cortisone_"),
+      ~ replace(.x, ID %in% c("MAV31", "MAV32", "MAV33") & is.na(.x), 0)
+    )
+  )
+
+
 # MAV DI ALTRI CENTRI
 merge_metadata[merge_metadata$ID == "MAV31", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-07-01"), "No", 2.5, 2.5, 2.5, as.Date("2017-08-07"), as.Date("2017-12-15"), "Negative", "No")
 merge_metadata[merge_metadata$ID == "MAV31", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("Yes", "Yes", "Yes", "No", "sensoriale", "No", "Yes", "No", "No", "No", as.Date("1975-10-07"), "No", "Rebif", 46)
 
 merge_metadata[merge_metadata$ID == "MAV32", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-08-23"), "No", 4, 4, 4, as.Date("2015-07-01"), as.Date("2016-07-01"), "Negative", "Yes")
-merge_metadata[merge_metadata$ID == "MAV32", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "previous_therapy", "age_at_t0")] <- list("Yes", "Yes", "No", "No", "tronco", "Yes", "No", "No", "No", "No", as.Date("1976-01-26"), "No", "Lemtrada", 45)
+merge_metadata[merge_metadata$ID == "MAV32", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "previous_therapy", "age_at_t0")] <- list("Yes", "Yes", "No", "No", "tronco", "Yes", "No", "No", "No", "No", as.Date("1976-01-26"), "Lemtrada", 45)
 
-merge_metadata[merge_metadata$ID == "MAV33", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment", "smoking_habit")] <- list(as.Date("2021-09-06"), "No", 2.5, 2.5, 2.5, as.Date("2021-02-15"), as.Date("2021-08-20"), "Negative", "No")
-merge_metadata[merge_metadata$ID == "MAV33", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "naive", "age_at_t0")] <- list("Yes", "Yes", "No", "No", "sensoriale", "Yes", "No", "No", "No", "No", as.Date("1998-11-09"), "Yes", 22)
+merge_metadata[merge_metadata$ID == "MAV33", c("Data_prelievo_T0", "cambio_terapia", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2021-09-06"), "No", 2.5, 2.5, 2.5, as.Date("2021-02-15"), as.Date("2021-08-20"), "Negative")
+merge_metadata[merge_metadata$ID == "MAV33", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "age_at_t0")] <- list("Yes", "Yes", "No", "No", "sensoriale", "Yes", "No", "No", "No", "No", as.Date("1998-11-09"), 22)
 
 merge_metadata[merge_metadata$ID == "MAV34", c("Data_prelievo_T0", "EDSS_T0", "EDSS_T12", "EDSS_T24", "Data_esordio", "Data_diagnosi", "gc_treatment")] <- list(as.Date("2022-04-19"), 2, 2, 2, as.Date("2008-01-01"), as.Date("2019-11-01"), "Positive")
 merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_lesions", "gadolinium_contrast", "clinical_presentation", "full_recovery", "lesioni_T12", "relapse_T12", "lesioni_T24", "relapse_T24", "Data_di_nascita", "age_at_t0")] <- list("No", "Yes", "No", "norb/sensoriale", "Yes", "No", "No", "No", "No", as.Date("1987-09-22"), 34)
@@ -256,6 +270,92 @@ merge_metadata[merge_metadata$ID == "MAV34", c("lesion_burden", "bone_marrow_les
 
 # creo la colonna age calcolata al giorno d'oggi
 merge_metadata$age <- floor(time_length(interval(as.Date(merge_metadata$Data_di_nascita), Sys.Date()), "years"))
+
+
+#aggiungo i gc_treatment da cleaned_metadata
+merge_metadata[merge_metadata$ID %in% c("MAV09", "MAV07"), "gc_treatment"] <- "Positive"
+merge_metadata[merge_metadata$ID %in% c("MAV34"), "naive"] <- "No"
+merge_metadata[merge_metadata$ID %in% c("MAV25"), "naive"] <- "No"
+
+
+#completo edss
+# Colonne EDSS in ordine temporale
+edss_cols <- c("EDSS_T0", "EDSS_T6", "EDSS_T12", "EDSS_T18",
+               "EDSS_T24", "EDSS_T30", "EDSS_T36")
+
+merge_metadata[edss_cols] <- t(apply(merge_metadata[edss_cols], 1, function(x){
+  
+  # indice dell'ultima osservazione non mancante
+  last_obs <- tail(which(!is.na(x)), 1)
+  
+  # se tutte NA o una sola osservazione, restituisce la riga invariata
+  if(length(last_obs) == 0 || last_obs == 1)
+    return(x)
+  
+  # LOCF solo fino all'ultima osservazione disponibile
+  for(i in 2:last_obs){
+    if(is.na(x[i])){
+      x[i] <- x[i-1]
+    }
+  }
+  
+  x
+}))
+
+
+
+# MAV22: T18 e T24 devono rimanere NA
+merge_metadata[merge_metadata$ID == "MAV22", c("EDSS_T0", "EDSS_T6")] <- NA
+
+#completo lesioni e relapse
+relapse_cols <- grep("^relapse_", names(merge_metadata), value = TRUE)
+
+merge_metadata[relapse_cols] <- t(apply(merge_metadata[relapse_cols], 1, function(x){
+  
+  last_obs <- tail(which(!is.na(x)), 1)
+  
+  if(length(last_obs) == 0) return(x)
+  
+  x[1:last_obs][is.na(x[1:last_obs])] <- "No"
+  
+  x
+}))
+
+
+lesioni_cols <- grep("^lesioni_", names(merge_metadata), value = TRUE)
+
+merge_metadata[lesioni_cols] <- t(apply(merge_metadata[lesioni_cols], 1, function(x){
+  
+  last_obs <- tail(which(!is.na(x)), 1)
+  
+  if(length(last_obs) == 0) return(x)
+  
+  x[1:last_obs][is.na(x[1:last_obs])] <- "No"
+  
+  x
+}))
+
+#cortisone completo
+cortisone_cols <- c( "cortisone_T6", "cortisone_T12",
+                    "cortisone_T18", "cortisone_T24", "cortisone_T30", "cortisone_T36")
+
+merge_metadata[cortisone_cols] <- t(apply(merge_metadata[cortisone_cols], 1, function(x){
+  
+  # ultima visita con un dato osservato
+  last_obs <- tail(which(!is.na(x)), 1)
+  
+  # se tutta la riga è NA, lascia tutto invariato
+  if(length(last_obs) == 0)
+    return(x)
+  
+  # sostituisce gli NA con 0 solo fino all'ultima osservazione
+  x[1:last_obs][is.na(x[1:last_obs])] <- 0
+  
+  x
+}))
+
+merge_metadata[merge_metadata$ID == "MAV20", c("lesioni_T6", "relapse_T6", "cortisone_T6","lesioni_T12", "relapse_T12", "cortisone_T12" )] <- list("No", "No", 0, "No", "No", 0)
+merge_metadata[merge_metadata$ID == "MAV19", c("lesioni_T18", "relapse_T18", "cortisone_T18","lesioni_T24", "relapse_T24", "cortisone_T24"  )] <- list("No", "No", 0, "No", "No", 0)
 
 
 # salvo il merge come csv
