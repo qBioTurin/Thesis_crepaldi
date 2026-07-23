@@ -67,6 +67,116 @@ modified_metadata <- modified_metadata %>%
     bmi_group = if_else(bmi >= 24, "High_bmi", "Low_bmi")
   )
 
-
+###scrivi file csv come input per app
 write.csv(modified_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/modified_metadata.csv", row.names = FALSE)
 
+
+
+##-----------------------------------------------
+######dataset con anche i sani############
+
+merged_data <- read.csv("Input/merged_data.csv")
+
+batch_data <- readxl::read_excel(
+  "Input/batch_sequenziamento.xlsx",
+  skip = 1
+) %>%
+  select(ID, sequencing_batch) %>%
+  rename(id = ID) %>%
+  filter(grepl("^MAV.*T0$", id)) %>%
+  mutate(
+    id = sub("T0$", "", id)
+  )
+
+cleaned_metadata <- read.csv(
+  "Input/metadata_cleaned_completo.csv",
+  sep=";"
+)
+
+cleaned_metadata_SANI <- cleaned_metadata %>%
+  filter(grepl("^(HV|ERR|AMCTRL|MBCTRL|NBCTRL|RRCTRL)", ID))
+
+names(cleaned_metadata_SANI)[names(cleaned_metadata_SANI)=="data_nascita"] <- "Data_di_nascita"
+names(cleaned_metadata_SANI)[names(cleaned_metadata_SANI)=="age_at_T0"] <- "age_at_t0"
+
+cols_keep <- c(
+  "ID",
+  "Data_di_nascita",
+  "MEDAS",
+  "bmi",
+  "naive",
+  "sex",
+  "age_at_t0",
+  "smoking_habit",
+  "physical_activity",
+  "dna_quantification",
+  "sequencing_batch",
+  "simplified_batch",
+  "sample_collection_date"
+)
+
+merged_data_reduced <- merged_data %>%
+  select(any_of(cols_keep))
+
+cleaned_metadata_SANI_reduced <- cleaned_metadata_SANI %>%
+  select(any_of(cols_keep))
+
+merged_data_complete <- bind_rows(
+  merged_data_reduced,
+  cleaned_metadata_SANI_reduced
+) %>%
+  rename(id = ID)
+
+## aggiorna SOLO i MAV
+merged_data_complete <- merged_data_complete %>%
+  left_join(
+    batch_data %>%
+      rename(sequencing_batch_T0 = sequencing_batch),
+    by = "id"
+  ) %>%
+  mutate(
+    sequencing_batch = if_else(
+      startsWith(id, "MAV"),
+      sequencing_batch_T0,
+      sequencing_batch
+    )
+  ) %>%
+  select(-sequencing_batch_T0)
+
+## elimina i MAV senza T0
+merged_data_complete <- merged_data_complete %>%
+  filter(!id %in% c(
+    "MAV08",
+    "MAV12",
+    "MAV16",
+    "MAV22",
+    "MAV23",
+    "MAV24",
+    "MAV25",
+    "MAV31"
+  ))
+
+## aggiungi T0 ai pazienti
+merged_data_complete <- merged_data_complete %>%
+  mutate(
+    id = if_else(
+      startsWith(id, "MAV"),
+      paste0(id, "T0"),
+      id
+    )
+  )
+
+## gruppo
+merged_data_complete <- merged_data_complete %>%
+  mutate(
+    group = if_else(
+      startsWith(id, "MAV"),
+      "Affected",
+      "Healthy"
+    )
+  )
+merged_data_complete <- merged_data_complete %>%
+  relocate(group, .after = id)
+
+###scrivi file csv come input per app + SANI
+write.csv(merged_data_complete, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data_complete_T0.csv", row.names = FALSE)

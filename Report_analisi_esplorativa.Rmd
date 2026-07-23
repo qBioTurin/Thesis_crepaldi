@@ -182,7 +182,7 @@ ggplot(merged_data, aes(x = EDSS_T36)) + geom_bar(fill = "#4C78A8", color = "whi
 ```
 
 Summary linepoint of the trend of the EDSS variable over time for each patient in the cohort:
-```{r}
+```{r lineplot}
 edss_long <- merged_data %>%
   select(ID, starts_with("EDSS_T")) %>%
   pivot_longer(
