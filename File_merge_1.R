@@ -307,53 +307,247 @@ merge_metadata[edss_cols] <- t(apply(merge_metadata[edss_cols], 1, function(x){
 # MAV22: T18 e T24 devono rimanere NA
 merge_metadata[merge_metadata$ID == "MAV22", c("EDSS_T0", "EDSS_T6")] <- NA
 
-#completo lesioni e relapse
-relapse_cols <- grep("^relapse_", names(merge_metadata), value = TRUE)
+########################
+#completamento ceci
+##################
 
-merge_metadata[relapse_cols] <- t(apply(merge_metadata[relapse_cols], 1, function(x){
-  
-  last_obs <- tail(which(!is.na(x)), 1)
-  
-  if(length(last_obs) == 0) return(x)
-  
-  x[1:last_obs][is.na(x[1:last_obs])] <- "No"
-  
-  x
-}))
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV19"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV19"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV19"] <- 0
+
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV05"] <- 3
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV05"] <- 0
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV05"] <- 3
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV05"] <- 0
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV05"] <- 3
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV05"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV05"] <- 3
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV05"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV05"] <- 0
+
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV07"] <- 2
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV07"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV07"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV07"] <- 0
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV07"] <- 2
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV07"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV07"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV07"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV07"] <- 2
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV07"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV07"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV07"] <- 0
+
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV09"] <- 3.5
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV09"] <- 3.5
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV09"] <- 2
+
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV12"] <- 0
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV12"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV12"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV12"] <- 0
+
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV13"] <- 1.5
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV13"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV13"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV13"] <- 0
+
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV14"] <- 1
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV14"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV14"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV14"] <- 0
+
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV15"] <- 4.5
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV15"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV15"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV15"] <- 0
+
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV17"] <- 1
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV17"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV17"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV17"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV17"] <- 1
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV17"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV17"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV17"] <- 0
+
+merge_metadata$EDSS_T12[merge_metadata$ID == "MAV18"] <- 2.5
+merge_metadata$lesioni_T12[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$relapse_T12[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV18"] <- 0
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV18"] <- 2.5
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV18"] <- 0
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV18"] <- 2.5
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV18"] <- 0
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV18"] <- 2.5
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV18"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV18"] <- 2.5
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV18"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV18"] <- 0
 
 
-lesioni_cols <- grep("^lesioni_", names(merge_metadata), value = TRUE)
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV19"] <- 0
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV19"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV19"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV19"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV19"] <- 0
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV19"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV19"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV19"] <- 0
 
-merge_metadata[lesioni_cols] <- t(apply(merge_metadata[lesioni_cols], 1, function(x){
-  
-  last_obs <- tail(which(!is.na(x)), 1)
-  
-  if(length(last_obs) == 0) return(x)
-  
-  x[1:last_obs][is.na(x[1:last_obs])] <- "No"
-  
-  x
-}))
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV20"] <- 1
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV20"] <- 0
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV20"] <- 1
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV20"] <- 0
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV20"] <- 1
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV20"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV20"] <- 1
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV20"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV20"] <- 0
 
-#cortisone completo
-cortisone_cols <- c( "cortisone_T6", "cortisone_T12",
-                    "cortisone_T18", "cortisone_T24", "cortisone_T30", "cortisone_T36")
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV23"] <- 2
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV23"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV23"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV23"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV23"] <- 2
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV23"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV23"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV23"] <- 0
 
-merge_metadata[cortisone_cols] <- t(apply(merge_metadata[cortisone_cols], 1, function(x){
-  
-  # ultima visita con un dato osservato
-  last_obs <- tail(which(!is.na(x)), 1)
-  
-  # se tutta la riga è NA, lascia tutto invariato
-  if(length(last_obs) == 0)
-    return(x)
-  
-  # sostituisce gli NA con 0 solo fino all'ultima osservazione
-  x[1:last_obs][is.na(x[1:last_obs])] <- 0
-  
-  x
-}))
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV27"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV27"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV27"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV27"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV27"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV27"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV27"] <- 0
 
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV28"] <- 0
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV28"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV28"] <- 0
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV28"] <- 0
+
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV29"] <- 1
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV29"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV29"] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV29"] <- 0
+
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV30"] <- 1
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV30"] <- 0
+merge_metadata$EDSS_T24[merge_metadata$ID == "MAV30"] <- 1
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV30"] <- 0
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV30"] <- 1
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV30"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV30"] <- 1
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV30"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV30"] <- 0
+
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV31"] <- 2.5
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV31"] <- 2.5
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV31"] <- 0
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV31"] <- 0
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV31"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV31"] <- 0
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV31"] <- 0
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV31"] <- 0
+
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV32"] <- 4
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV32"] <- 4
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV32"] <- 0
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV32"] <- 0
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV32"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV32"] <- 0
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV32"] <- 0
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV32"] <- 0
+
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV33"] <- 2.5
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV33"] <- 2.5
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV33"] <- 0
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV33"] <- 0
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV33"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV33"] <- 0
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV33"] <- 0
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV33"] <- 0
+
+merge_metadata$EDSS_T30[merge_metadata$ID == "MAV34"] <- 2
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$EDSS_T36[merge_metadata$ID == "MAV34"] <- 2
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV34"] <- 0
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV34"] <- 0
+
+merge_metadata$EDSS_T18[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$EDSS_T12[merge_metadata$ID == "MAV27"] <- 0
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV10"] <- "Yes"
+
+# Colonne da azzerare (mettere a NA) per MAV08: T12, T18, T24, T30, T36
+cols_mav08 <- c("lesioni_T12","relapse_T12","cortisone_T12",
+                "lesioni_T18","relapse_T18","cortisone_T18",
+                "lesioni_T24","relapse_T24","cortisone_T24",
+                "lesioni_T30","relapse_T30","cortisone_T30",
+                "lesioni_T36","relapse_T36","cortisone_T36")
+
+merge_metadata[merge_metadata$ID == "MAV08", cols_mav08] <- NA
+
+merge_metadata$naive[merge_metadata$ID == "MAV22"] <- "Yes"
+merge_metadata$naive[merge_metadata$ID == "MAV23"] <- "Yes"
+merge_metadata$naive[merge_metadata$ID == "MAV16"] <- "Yes"
+
+
+
+
+
+
+
+
+
+
+####################################################
 merge_metadata[merge_metadata$ID == "MAV20", c("lesioni_T6", "relapse_T6", "cortisone_T6","lesioni_T12", "relapse_T12", "cortisone_T12" )] <- list("No", "No", 0, "No", "No", 0)
 merge_metadata[merge_metadata$ID == "MAV19", c("lesioni_T18", "relapse_T18", "cortisone_T18","lesioni_T24", "relapse_T24", "cortisone_T24"  )] <- list("No", "No", 0, "No", "No", 0)
 merge_metadata[merge_metadata$ID == "MAV07", "bmi"] <- 23.51
