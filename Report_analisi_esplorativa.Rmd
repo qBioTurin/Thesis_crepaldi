@@ -71,12 +71,12 @@ The population is predominantly female, with 21 females (70.0%) and 9 males (30.
 At baseline (T0), the mean age was 37.37 years (± 9.89), with a median of 38.50 years, ranging from 20 to 55 years, indicating a relatively young cohort.
 Disease activity was predominantly classified as higher activity.
 Disability at baseline, measured by EDSS, showed generally low values reflected by a median of 1.5 and 26.7% of patients with a EDSS 1. 
-Regarding treatment history, 18 patients (60.0%) were naive, while 11 (36.7%) had received prior therapies.
-Glucocorticoid treatment before T0 was reported in 12 patients (40.0%), whereas 6 patients (20.0%) had not received such treatment and data were missing for 12 subjects.
+Regarding treatment history, 18 patients (60.0%) were naive, while 12 (40%) had received prior therapies.
+Glucocorticoid treatment before T0 was reported in 14 patients (46.7%), whereas 6 patients (20.0%) had not received such treatment and data were missing for 10 subjects.
 
-Regarding lifestyle factors, the mean body mass index (BMI) was 23.54 ± 4.85, ranging from 16.80 to 32.10, with 9 missing values.
-Adherence to the Mediterranean diet, assessed by the MEDAS score (from 0 to 100), showed a mean value of 50.55 ± 15.18, with a wide range (35.00–85.70) and 8 missing observations.
-7 patients (23.3%) are smokers and 17 (56.7%) are non-smokers, with 6 missing values.
+Regarding lifestyle factors, the mean body mass index (BMI) was 23.76 ± 4.76, ranging from 16.80 to 32.10, with 6 missing values.
+Adherence to the Mediterranean diet, assessed by the MEDAS score (from 0 to 100), showed a mean value of 50.17 ± 14.92, with a wide range (35.00–85.70) and 6 missing observations.
+8 patients (26.7%) are smokers and 16 (53.3%) are non-smokers, with 6 missing values.
 Physical activity is heterogeneously distributed among the cohort with 5 (16.7%) patients classified as active, 7 (23.3%) as partially active and 9 (30%) as sedentary, with 9 missing values.
 
 ```{r summary_table}
@@ -304,16 +304,39 @@ ggplot(subset(merged_data, !is.na(physical_activity) & !is.na(EDSS_T24)), aes(x 
 kruskal.test(as.numeric(as.character(EDSS_T30)) ~ physical_activity, data = merged_data) 
 kruskal.test(as.numeric(as.character(EDSS_T36)) ~ physical_activity, data = merged_data) 
 
-#andamento totale
+
+# andamento totale
 edss_long <- merged_data %>%
-  select(ID, smoking_habit, sex, naive, physical_activity, EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T18, EDSS_T24, EDSS_T30) %>%
-  pivot_longer(cols = starts_with("EDSS"), names_to = "time", values_to = "EDSS_val") %>%
-  mutate(EDSS_val = as.numeric(as.character(EDSS_val)), sex = trimws(as.character(sex)), time = factor(time, levels = c("EDSS_T0","EDSS_T6","EDSS_T12","EDSS_T18","EDSS_T24","EDSS_T30"))) %>%
-  filter(!is.na(EDSS_val))
-ggplot(edss_long, aes(x = time, y = EDSS_val, color = physical_activity, group = physical_activity)) +
-  stat_summary(fun = median, geom = "line", linewidth = 1.2, na.rm = TRUE) +
-  stat_summary(fun = median, geom = "point", size = 3, na.rm = TRUE) +
-  theme_minimal() + labs(title="EDSS during time by Physical Activity", x = "Time", y = "Median EDSS")
+  select(ID, smoking_habit, sex, naive, physical_activity,
+         EDSS_T0, EDSS_T6, EDSS_T12, EDSS_T18, EDSS_T24, EDSS_T30) %>%
+  pivot_longer(
+    cols = starts_with("EDSS"),
+    names_to = "time",
+    values_to = "EDSS_val"
+  ) %>%
+  mutate(
+    EDSS_val = as.numeric(as.character(EDSS_val)),
+    sex = trimws(as.character(sex)),
+    time = factor(
+      time,
+      levels = c("EDSS_T0", "EDSS_T6", "EDSS_T12",
+                 "EDSS_T18", "EDSS_T24", "EDSS_T30")
+    )
+  ) %>%
+  filter(!is.na(EDSS_val), !is.na(physical_activity))
+
+ggplot(edss_long,
+       aes(x = time, y = EDSS_val,
+           color = physical_activity,
+           group = physical_activity)) +
+  stat_summary(fun = median, geom = "line", linewidth = 1.2) +
+  stat_summary(fun = median, geom = "point", size = 3) +
+  theme_minimal() +
+  labs(
+    title = "EDSS during time by Physical Activity",
+    x = "Time",
+    y = "Median EDSS"
+  )
 ```
 
 
@@ -425,9 +448,14 @@ wilcox.test(as.numeric(as.character(EDSS_T12)) ~ gadolinium_contrast, data = mer
 ```{r EDSS_vs_gc_treatment}
 #glucocorticoid treatment before T0 e edss T0 #SIGNIFICATIVO
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ gc_treatment, data = merged_data)
-ggplot(merged_data, aes(x = gc_treatment, y = as.numeric(as.character(EDSS_T0)))) + geom_boxplot() + theme_minimal() + labs(title= "Glucocorticoid treatment before T0", x= "gc treatment", y="EDSS T0")
+
+ggplot(merged_data,
+  aes(x = gc_treatment, y = as.numeric(as.character(EDSS_T0)),fill = gc_treatment)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Glucocorticoid treatment before T0",x = "GC treatment", y = "EDSS T0")
 ```
 
 Overall, no statistically significant associations were observed between EDSS and most clinical or lifestyle variables across time points. Notably, a significant positive association was observed between EDSS and bone marrow lesions, specifically at the T12 time-point. Additionally, glucocorticoid treatment showed a significant positive difference between groups at T0.
-Regarding age, while age at baseline was generally associated with higher EDSS values at later stages, a specific positive and significant difference was found between age at T0 and the presence of lesions at both T6 and T12.
+Regarding age, while age at baseline was generally associated with higher EDSS values at later stages, a specific positive and significant difference was found between age at T0 and the presence of lesions at T12.
 Physical activity showed a potential trend, with more sedentary patients displaying a higher EDSS values over time, but the statistical tests are not significant. Although these results remain robust, it is important to consider that the findings at later time points may be partially influenced by missing data.

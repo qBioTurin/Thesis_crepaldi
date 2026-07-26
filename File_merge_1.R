@@ -539,14 +539,6 @@ merge_metadata$naive[merge_metadata$ID == "MAV23"] <- "Yes"
 merge_metadata$naive[merge_metadata$ID == "MAV16"] <- "Yes"
 
 
-
-
-
-
-
-
-
-
 ####################################################
 merge_metadata[merge_metadata$ID == "MAV20", c("lesioni_T6", "relapse_T6", "cortisone_T6","lesioni_T12", "relapse_T12", "cortisone_T12" )] <- list("No", "No", 0, "No", "No", 0)
 merge_metadata[merge_metadata$ID == "MAV19", c("lesioni_T18", "relapse_T18", "cortisone_T18","lesioni_T24", "relapse_T24", "cortisone_T24"  )] <- list("No", "No", 0, "No", "No", 0)
