@@ -1,5 +1,44 @@
 source("Libraries.R")
 
+###########prove##################
+#####################################
+#per dividere per tempo
+ggplot(significant_bacteria_prevalence_pvalue,
+       aes(y = reorder(feature, -pval_individual), x = coef)) +
+  geom_segment(aes(x = 0, xend = coef,
+                   yend = reorder(feature, -pval_individual)),
+               color = "grey70", linewidth = 0.8) +
+  geom_point(aes(color = neg_log10_p), size = 4) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient(low = "lightblue", high = "darkblue",
+                       name = expression(-log[10](p-value))) +
+  facet_wrap(~ value, nrow = 1) +
+  labs(x = "Beta coefficient", y = "Species",
+       title = "Significant Bacteria prevalence (pvalue)") +
+  theme_classic()
+
+##prova maaslin con small_random_effects = true
+all_definitive_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati maaslin PROVAAA\\all_results.tsv")
+
+significant_bacteria_prevalence_pvalue <- all_definitive_bacteria %>%
+  filter(model == "prevalence", metadata == "tp",
+         pval_individual < 0.05)
+
+
+#######################################################
+###################################################
+
+
+
+
+
+
+
+
+
+
+
+
 ######risultati con pazienti totali#####
 #batteri
 all_definitive_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati_maaslin_bacteria\\all_results.tsv")
@@ -8,27 +47,37 @@ significant_bacteria_prevalence_pvalue <- all_definitive_bacteria %>%
   filter(model == "prevalence", metadata == "tp",
     pval_individual < 0.05)
 
-write.csv(significant_bacteria_prevalence_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_pvalue.csv", row.names = FALSE)
+#write.csv(significant_bacteria_prevalence_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_pvalue.csv", row.names = FALSE)
 
 
 significant_bacteria_prevalence_qvalue <- all_definitive_bacteria %>%
   filter(model == "prevalence", metadata == "tp", qval_individual < 0.1)
 
-write.csv(significant_bacteria_prevalence_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_qvalue.csv", row.names = FALSE)
+#write.csv(significant_bacteria_prevalence_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_qvalue.csv", row.names = FALSE)
 
 
 significant_bacteria_abundance_pvalue <- all_definitive_bacteria %>%
   filter(model == "abundance", metadata == "tp",
     pval_individual < 0.05)
 
-write.csv(significant_bacteria_abundance_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_abundance_pvalue.csv", row.names = FALSE)
+#write.csv(significant_bacteria_abundance_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_abundance_pvalue.csv", row.names = FALSE)
 
 
 significant_bacteria_abundance_qvalue <- all_definitive_bacteria %>%
   filter(model == "abundance", metadata == "tp",
          qval_individual < 0.1)
 
-write.csv(significant_bacteria_abundance_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_bacteria_abundance_qvalue.csv", row.names = FALSE)
+#write.csv(significant_bacteria_abundance_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_bacteria_abundance_qvalue.csv", row.names = FALSE)
+
+###batteri significativi sia per prevalenza che per abbondanza qvalue -> per association plot
+significant_bacteria_both_qvalue <- all_definitive_bacteria %>%
+  filter(metadata == "tp",
+         model %in% c("prevalence", "abundance"),
+         qval_individual < 0.1) %>%
+  group_by(feature) %>%
+  filter(all(c("prevalence", "abundance") %in% model)) %>%
+  ungroup()
+
 
 
 #eukarioti

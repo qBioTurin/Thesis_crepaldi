@@ -6,6 +6,10 @@ batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx",skip = 1) %>%
   select(ID, sequencing_batch) %>%
   rename(id = ID)
 batch_data$id[batch_data$id == "MAV5T15"] <- "MAV05T15"
+#rinomino MAV23 con i report giusti
+batch_data$id[batch_data$id == "MAV23T12"] <- "MAV23T0"
+batch_data$id[batch_data$id == "MAV23T24"] <- "MAV23T12"
+batch_data$id[batch_data$id == "MAV23T36"] <- "MAV23T24"
 
 modified_metadata <- modified_metadata %>%
   filter(!ID %in% c("MAV08", "MAV24"))
@@ -81,7 +85,10 @@ batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx", skip = 1) %>
   rename(id = ID)
 
 batch_data$id[batch_data$id == "MAV5T15"] <- "MAV05T15"
-
+#rinomino MAV23 con i report giusti
+batch_data$id[batch_data$id == "MAV23T12"] <- "MAV23T0"
+batch_data$id[batch_data$id == "MAV23T24"] <- "MAV23T12"
+batch_data$id[batch_data$id == "MAV23T36"] <- "MAV23T24"
 modified_metadata <- modified_metadata %>%
   filter(!ID %in% c("MAV08", "MAV24"))
 
@@ -157,16 +164,20 @@ write.csv(modified_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/The
 
 merged_data <- read.csv("Input/merged_data.csv")
 
-batch_data <- readxl::read_excel(
-  "Input/batch_sequenziamento.xlsx",
-  skip = 1
-) %>%
-  select(ID, sequencing_batch) %>%
+batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx", skip = 1) 
+batch_data$ID[batch_data$ID == "MAV5T15"] <- "MAV05T15"
+#rinomino MAV23 con i report giusti
+batch_data$ID[batch_data$ID == "MAV23T12"] <- "MAV23T0"
+batch_data$ID[batch_data$ID == "MAV23T24"] <- "MAV23T12"
+batch_data$ID[batch_data$ID == "MAV23T36"] <- "MAV23T24"
+
+
+batch_data <- batch_data %>%
+select(ID, sequencing_batch) %>%
   rename(id = ID) %>%
   filter(grepl("^MAV.*T0$", id)) %>%
   mutate(
-    id = sub("T0$", "", id)
-  )
+    id = sub("T0$", "", id))
 
 cleaned_metadata <- read.csv(
   "Input/metadata_cleaned_completo.csv",
@@ -230,7 +241,6 @@ merged_data_complete <- merged_data_complete %>%
     "MAV12",
     "MAV16",
     "MAV22",
-    "MAV23",
     "MAV24",
     "MAV25",
     "MAV31"

@@ -11,7 +11,7 @@
 source("Libraries.R")
 main_el= "tp"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder= "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/Risultati_maaslin_bacteria"
+output_folder= "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/risultati maaslin PROVAAA"
 
 #QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
 rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
@@ -82,6 +82,7 @@ fit_out <- maaslin3(
   formula = formulaInUse_fin,
   fixed_effects = fx_effects,
   plot_summary_plot = TRUE,
+  small_random_effects = TRUE,
   reference = c('tp,T0'),
   standardize= TRUE,#o continuous guardare se standardizzare o meno le variabili continue
   coef_plot_vars = coef_plot_vars,
