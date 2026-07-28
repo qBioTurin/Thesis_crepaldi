@@ -11,10 +11,10 @@
 source("Libraries.R")
 main_el= "tp"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder= "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/risultati maaslin PROVAAA"
+output_folder= "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/risultati_maaslin_eukaryota"
 
 #QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
-rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
+rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
 otu <- rds@otu_table
 taxa <- rds@tax_table
 metadata_df <- as(rds@sam_data, "data.frame")
@@ -110,10 +110,10 @@ fit_out <- maaslin3(
 
 main_el = "group"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder = "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_app_healty_plus_MAV/Risultati_maaslin_complete_eukaryota"
+output_folder = "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_app_healty_plus_MAV/Risultati_maaslin_complete_bacteria"
 
 # QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
-rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
+rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
 
 otu <- rds@otu_table
 taxa <- rds@tax_table
@@ -208,7 +208,6 @@ fit_out <- maaslin3(
   fixed_effects = fx_effects,
   
   plot_summary_plot = TRUE,
-  
   reference = c("group,Healthy"),
   
   standardize = TRUE,
@@ -245,4 +244,6 @@ fit_out <- maaslin3(
   
   cores = 1
 )
+
+
 

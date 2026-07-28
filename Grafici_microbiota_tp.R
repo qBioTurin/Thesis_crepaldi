@@ -67,7 +67,7 @@ plot_alpha <- function(metric){
       stat$P_value <= 0.0001 ~ "****",
       stat$P_value <= 0.001 ~ "***",
       stat$P_value <= 0.01 ~ "**",
-      stat$P_value <= 0.05 ~ "*" )
+      stat$P_value < 0.05 ~ "*" )
   
     stat$label <- paste0(
       stat$p.signif,
@@ -159,7 +159,7 @@ plot_alpha <- function(metric){
       stat$P_value <= 0.0001 ~ "****",
       stat$P_value <= 0.001 ~ "***",
       stat$P_value <= 0.01 ~ "**",
-      stat$P_value <= 0.05 ~ "*" )
+      stat$P_value < 0.05 ~ "*" )
     
     stat$label <- paste0(
       stat$p.signif,
@@ -250,7 +250,7 @@ plot_alpha <- function(metric){
       stat$P_value <= 0.0001 ~ "****",
       stat$P_value <= 0.001 ~ "***",
       stat$P_value <= 0.01 ~ "**",
-      stat$P_value <= 0.05 ~ "*" )
+      stat$P_value < 0.05 ~ "*" )
     
     stat$label <- paste0(
       stat$p.signif,

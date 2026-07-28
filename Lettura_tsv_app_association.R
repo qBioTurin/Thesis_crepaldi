@@ -1,51 +1,15 @@
 source("Libraries.R")
 
-###########prove##################
-#####################################
-#per dividere per tempo
-ggplot(significant_bacteria_prevalence_pvalue,
-       aes(y = reorder(feature, -pval_individual), x = coef)) +
-  geom_segment(aes(x = 0, xend = coef,
-                   yend = reorder(feature, -pval_individual)),
-               color = "grey70", linewidth = 0.8) +
-  geom_point(aes(color = neg_log10_p), size = 4) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
-  scale_color_gradient(low = "lightblue", high = "darkblue",
-                       name = expression(-log[10](p-value))) +
-  facet_wrap(~ value, nrow = 1) +
-  labs(x = "Beta coefficient", y = "Species",
-       title = "Significant Bacteria prevalence (pvalue)") +
-  theme_classic()
-
-##prova maaslin con small_random_effects = true
-all_definitive_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati maaslin PROVAAA\\all_results.tsv")
-
-significant_bacteria_prevalence_pvalue <- all_definitive_bacteria %>%
-  filter(model == "prevalence", metadata == "tp",
-         pval_individual < 0.05)
-
-
-#######################################################
-###################################################
-
-
-
-
-
-
-
-
-
-
-
-
+############################################
 ######risultati con pazienti totali#####
+############################################
+
 #batteri
 all_definitive_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati_maaslin_bacteria\\all_results.tsv")
 
 significant_bacteria_prevalence_pvalue <- all_definitive_bacteria %>%
   filter(model == "prevalence", metadata == "tp",
-    pval_individual < 0.05)
+         pval_individual < 0.05)
 
 #write.csv(significant_bacteria_prevalence_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_pvalue.csv", row.names = FALSE)
 
@@ -58,7 +22,7 @@ significant_bacteria_prevalence_qvalue <- all_definitive_bacteria %>%
 
 significant_bacteria_abundance_pvalue <- all_definitive_bacteria %>%
   filter(model == "abundance", metadata == "tp",
-    pval_individual < 0.05)
+         pval_individual < 0.05)
 
 #write.csv(significant_bacteria_abundance_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_abundance_pvalue.csv", row.names = FALSE)
 
@@ -69,18 +33,222 @@ significant_bacteria_abundance_qvalue <- all_definitive_bacteria %>%
 
 #write.csv(significant_bacteria_abundance_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_bacteria_abundance_qvalue.csv", row.names = FALSE)
 
-###batteri significativi sia per prevalenza che per abbondanza qvalue -> per association plot
-significant_bacteria_both_qvalue <- all_definitive_bacteria %>%
-  filter(metadata == "tp",
-         model %in% c("prevalence", "abundance"),
-         qval_individual < 0.1) %>%
-  group_by(feature) %>%
-  filter(all(c("prevalence", "abundance") %in% model)) %>%
-  ungroup()
+significant_bacteria_abundance_qvalue$feature
+
+#####
+#ASSOCIATION PLOTS
+#####
+rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
+metadata_df <- as(rds@sam_data, "data.frame")
+unique(metadata_df$tp)
+
+metadata_df$tp <- factor(
+  as.character(metadata_df$tp),
+  levels = c("T0", "T3", "T12", "T15", "T24", "T36"))
+unique(metadata_df$tp)
+
+
+sig_species <- significant_bacteria_abundance_qvalue %>%
+  filter(qval_individual < 0.1) %>%
+  pull(feature) %>%
+  unique()
+
+maaslin_transformed <- read.delim(
+  "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/risultati_maaslin_bacteria/features/data_transformed.tsv",
+  row.names = 1,
+  check.names = FALSE
+)
+
+#alistipes onderdonkii
+sp <- "Alistipes_onderdonkii"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Alistipes onderdonkii", 
+           subtitle = "Beta coefficient: 3.803 | qvalue: 0.044 | Value: T24",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+ } else {
+  message("Specie non trovata: ", sp)
+}
+
+#eghertella lenta
+sp <- "Eggerthella_lenta"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Eggerthella lenta", 
+           subtitle = "Beta coefficient: -2.158 | qvalue: 0.044 | Value: T3-T12",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
+
+#Parabacteroides_chongii
+sp <- "Parabacteroides_chongii"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Parabacteroides chongii", 
+           subtitle = "Beta coefficient: 3.035 | qvalue: 0.044| Value: T24",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
+
+#Collinsella_sp. i05-0019-G5
+sp <- "Collinsella_sp. i05-0019-G5"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Collinsella_sp. i05-0019-G5", 
+           subtitle = "Beta coefficient: -1.799 | qvalue: 0.052 | Value: T3",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
+
+#Gordonibacter_pamelaeae
+sp <- "Gordonibacter_pamelaeae"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Gordonibacter pamelaeae", 
+           subtitle = "Beta coefficient: -2.508 | qvalue: 0.052 | Value: T3 & T12",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
+
+#Segatella_copri
+sp <- "Segatella_copri"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Segatella copri", 
+           subtitle = "Beta coefficient: 1.892 | qvalue: 0.052 | Value: T3",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
+
+#Coprococcus_catus
+sp <- "Coprococcus_catus"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Coprococcus catus", 
+           subtitle = "Beta coefficient: 2.363 | qvalue: 0.072 | Value: T15",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
+
+#Bifidobacterium_angulatum
+sp <- "Bifidobacterium_angulatum"
+if(sp %in% colnames(maaslin_transformed)){
+  plot_df <- data.frame(
+    tp = metadata_df$tp,
+    abundance = maaslin_transformed[, sp]
+  )
+  print(
+    ggplot(plot_df, aes(x = tp, y = abundance, fill = tp)) +
+      geom_boxplot() +
+      geom_jitter(width = 0.15, size = 2) +
+      theme_bw() +
+      labs(title = "Bifidobacterium angulatum", 
+           subtitle = "Beta coefficient: -4.123 | qvalue: 0.099 | Value: T15",
+           tag = "Significant Abundance",
+           x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
+    theme(
+      plot.tag = element_markdown(hjust = 1, size = 12),
+      plot.tag.position = c(0.95, 0.98))
+} else {
+  message("Specie non trovata: ", sp)
+}
 
 
 
+
+#########
 #eukarioti
+##########
 all_definitive_eukaryota = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati_maaslin_eukaryota\\all_results.tsv")
 
 significant_eukaryota_prevalence_pvalue <- all_definitive_eukaryota %>%
@@ -98,9 +266,10 @@ significant_eukaryota_abundance_pvalue <- all_definitive_eukaryota %>%
 significant_eukaryota_abundance_qvalue <- all_definitive_eukaryota %>%
   filter(model == "abundance", metadata == "tp",
          qval_individual < 0.1)
-
+###########
 #Archaea
-all_definitive_archaea = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati_maaslin_archea\\all_results.tsv")
+##########
+all_definitive_archaea = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\risultati_maaslin_archaea\\all_results.tsv")
 
 significant_archaea_prevalence_pvalue <- all_definitive_archaea %>%
   filter(model == "prevalence", metadata == "tp",
@@ -124,6 +293,9 @@ numero_taxa_archaea = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Anali
 numero_taxa_eukariota = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
 
 
+##########################################################################################################################
+#SUMMARY PLOT
+####################################
 ##grafici summary plot per ogni matrice:
 
 #batteri prevalence pvalue
@@ -143,7 +315,7 @@ ggplot(significant_bacteria_prevalence_pvalue,
              linetype = "dashed",
              color = "black") +
   scale_color_gradient(low = "lightblue",high = "darkblue",
-    name = expression(-log[10](p-value))) +
+                       name = expression(-log[10](p-value))) +
   scale_x_continuous(limits = c(-max_abs_coef, max_abs_coef)) +
   labs(
     x = "Beta coefficient",
@@ -323,9 +495,9 @@ ggplot(significant_archaea_abundance_pvalue,
   
   theme_classic()
 
-###############---------------------------------------------###########
+###############---------###############################################------------------------------------###########
 ###analisi matrici healthy vs affected
-
+##########################################################################--------------------------------------------
 #batteri
 healty_affected_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\Risultati_maaslin_complete_bacteria\\all_results.tsv")
 
@@ -333,25 +505,25 @@ significant_bacteria_prevalence_pvalue_h <- healty_affected_bacteria %>%
   filter(model == "prevalence", metadata == "group",
          pval_individual < 0.05)
 
-write.csv(significant_bacteria_prevalence_pvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_prevalence_pvalue_h.csv")
+#write.csv(significant_bacteria_prevalence_pvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_prevalence_pvalue_h.csv")
 
 significant_bacteria_prevalence_qvalue_h <- healty_affected_bacteria %>%
   filter(model == "prevalence", metadata == "group", qval_individual < 0.1)
 
-write.csv(significant_bacteria_prevalence_qvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_prevalence_qvalue_h.csv")
+#write.csv(significant_bacteria_prevalence_qvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_prevalence_qvalue_h.csv")
 
 
 significant_bacteria_abundance_pvalue_h <- healty_affected_bacteria %>%
   filter(model == "abundance", metadata == "group",
          pval_individual < 0.05)
 
-write.csv(significant_bacteria_abundance_pvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_abundance_pvalue_h.csv")
+#write.csv(significant_bacteria_abundance_pvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_abundance_pvalue_h.csv")
 
 significant_bacteria_abundance_qvalue_h <- healty_affected_bacteria %>%
   filter(model == "abundance", metadata == "group",
          qval_individual < 0.1)
 
-write.csv(significant_bacteria_abundance_qvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_abundance_qvalue_h.csv")
+#write.csv(significant_bacteria_abundance_qvalue_h ,"C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\analisi sani vs malati\\significant_bacteria_abundance_qvalue_h.csv")
 
 
 #eukarioti
@@ -518,4 +690,11 @@ ggplot(significant_eukaryota_abundance_pvalue_h,
 #archaea prevalence pvalue e qvalue NO!!!
 #archaea abundance qvalue NO!!!
 #archaea abundance pvalue NO!!!!
+
+
+
+
+
+
+
 

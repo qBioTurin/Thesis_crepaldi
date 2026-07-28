@@ -64,7 +64,7 @@ prevalence_table %>%
     T24 == 0,
     T36 == 0
   )
-#sp. ZQ21
+#sp. ZQ21, desulfuricans
 
 #T3
 prevalence_table %>%
@@ -149,7 +149,7 @@ prevalence_table %>%
     T24 == 0,
     T36 == 0
   )
-#desulfuricans
+#nessuna
 
 
 
@@ -172,8 +172,8 @@ n_per_tp <- table(meta$tp)
 print(n_per_tp)
 
 # soglia minima di prevalenza per considerare un taxon "presente" in un TP
-# (es. almeno il 15-20% dei campioni di quel TP, invece di >0)
-prev_threshold <- 0.15
+# (es. almeno il 15-20% dei campioni di quel TP, invece di >0) (IO METTO 5%)
+prev_threshold <- 0.10
 
 prevalence <- lapply(unique(meta$tp), function(tp) {
   samples_tp <- rownames(meta)[meta$tp == tp]
@@ -344,6 +344,84 @@ ggplot(library_df,
     axis.text.x = element_text(angle = 90, hjust = 1)
   )
 
+#####Archaea
+ps1 <- readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Archaea_Supervised_decontam.rds")
+
+otu <- otu_table(ps1)
+#library size
+if (taxa_are_rows(ps1)) {
+  library_size <- colSums(as(otu, "matrix"))
+} else {
+  library_size <- rowSums(as(otu, "matrix"))
+}
+# Metadata
+meta <- data.frame(sample_data(ps1), stringsAsFactors = FALSE)
+meta$Sample <- rownames(meta)
+
+library_df <- data.frame(
+  Sample = names(library_size),
+  Library_size = as.numeric(library_size)
+)
+library_df <- dplyr::left_join(
+  library_df,
+  meta,
+  by = "Sample"
+)
+#grafico
+ggplot(library_df,
+       aes(x = reorder(Sample, Library_size),
+           y = Library_size,
+           fill = tp)) +
+  geom_col() +
+  labs(
+    x = "Sample",
+    y = "Total reads",
+    fill = "Timepoint"
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1)
+  )
+
+
+#####Eukaryota
+ps2 <- readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
+
+otu <- otu_table(ps2)
+#library size
+if (taxa_are_rows(ps2)) {
+  library_size <- colSums(as(otu, "matrix"))
+} else {
+  library_size <- rowSums(as(otu, "matrix"))
+}
+# Metadata
+meta <- data.frame(sample_data(ps2), stringsAsFactors = FALSE)
+meta$Sample <- rownames(meta)
+
+library_df <- data.frame(
+  Sample = names(library_size),
+  Library_size = as.numeric(library_size)
+)
+library_df <- dplyr::left_join(
+  library_df,
+  meta,
+  by = "Sample"
+)
+#grafico
+ggplot(library_df,
+       aes(x = reorder(Sample, Library_size),
+           y = Library_size,
+           fill = tp)) +
+  geom_col() +
+  labs(
+    x = "Sample",
+    y = "Total reads",
+    fill = "Timepoint"
+  ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1)
+  )
 
 
 
