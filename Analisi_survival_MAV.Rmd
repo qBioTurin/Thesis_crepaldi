@@ -54,6 +54,8 @@ merged_data[cols_numeric] <- lapply(merged_data[cols_numeric], as.numeric)
 merged_data$NOTE <- gsub("[#$%&_]", " ", merged_data$NOTE)
 merged_data$nuova_terapia <- gsub("[#$%&_]", " ", merged_data$nuova_terapia)
 merged_data$previous_therapy <- gsub("[#$%&_]", " ", merged_data$previous_therapy)
+
+
 ```
 
 EDSS trend for each MAV patient, lineplot:

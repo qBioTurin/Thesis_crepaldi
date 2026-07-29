@@ -546,8 +546,97 @@ merge_metadata[merge_metadata$ID == "MAV07", "bmi"] <- 23.51
 merge_metadata[merge_metadata$ID == "MAV08", "bmi"] <- 21.88
 merge_metadata[merge_metadata$ID == "MAV22", "bmi"] <- 30.45
 
+merge_metadata[merge_metadata$ID == "MAV23", c("lesioni_T30", "relapse_T30", "cortisone_T30","lesioni_T36", "relapse_T36", "cortisone_T36" )] <- list("No", "No", 0, "No", "No", 0)
+merge_metadata[merge_metadata$ID == "MAV23", c("EDSS_T30", "EDSS_T36")] <- list(2, 2.5)
+merge_metadata[merge_metadata$ID == "MAV23", c("data_referto_T30", "data_referto_T36")] <-list(as.Date("2026-01-01"), as.Date("2026-04-01"))
                
-               
+#merge con nuovi dati radiologici raccolti a luglio
+dati_radiologici = read_excel("Input/merged_dati_radiologici.xlsx")
+
+merge_metadata[merge_metadata$ID == "MAV07", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Positive", "Yes", "Yes", "No", "Yes")
+merge_metadata[merge_metadata$ID == "MAV08", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "smoking_habit", "physical_activity")] <- list("Negative", "Yes", "No", "Yes", "Yes", "Yes", "active")
+merge_metadata[merge_metadata$ID == "MAV09", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Positive", "Yes", "Yes", "Yes", "Yes")
+merge_metadata[merge_metadata$ID == "MAV12", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Negative", "Yes", "Yes", "Yes", "Yes")
+merge_metadata[merge_metadata$ID == "MAV15", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "gadolinium_contrast")] <- list("Negative", "Yes", "Yes", "No")
+merge_metadata[merge_metadata$ID == "MAV16", c( "bone_marrow_lesions")] <- list("No")
+merge_metadata[merge_metadata$ID == "MAV20", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Negative", "No", "Yes", "No", "No")
+merge_metadata[merge_metadata$ID == "MAV22", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Positive", "Yes", "Yes", "Yes", "No")
+merge_metadata[merge_metadata$ID == "MAV23", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Positive", "Yes", "Yes", "No", "Yes")
+merge_metadata[merge_metadata$ID == "MAV24", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast", "smoking_habit")] <- list("Negative", "Yes", "Yes", "Yes", "No", "Yes")
+merge_metadata[merge_metadata$ID == "MAV25", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Yes", "Yes", "No", "Yes")
+merge_metadata[merge_metadata$ID == "MAV26", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Negative", "No", "No", "Yes", "Yes")
+merge_metadata[merge_metadata$ID == "MAV12", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Negative", "Yes", "Yes", "Yes", "Yes")
+
+merge_metadata$relapse_T12[merge_metadata$ID == "MAV16"] <- "No"
+merge_metadata$relapse_T12[merge_metadata$ID == "MAV23"] <- "No"
+merge_metadata$relapse_T12[merge_metadata$ID == "MAV24"] <- "No"
+merge_metadata$lesioni_T12[merge_metadata$ID == "MAV16"] <- "No"
+merge_metadata$lesioni_T12[merge_metadata$ID == "MAV23"] <- "No"
+merge_metadata$lesioni_T12[merge_metadata$ID == "MAV24"] <- "No"
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV16"] <- 0
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV23"] <- 0
+merge_metadata$cortisone_T12[merge_metadata$ID == "MAV24"] <- 0
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV14"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV15"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV16"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV17"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV22"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$lesioni_T6[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV10"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV14"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV15"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV16"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV17"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV22"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV09"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV10"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV14"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV15"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV16"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV17"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV22"] <- 0
+merge_metadata$cortisone_T6[merge_metadata$ID == "MAV28"] <- 0
+
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV14"] <- "No"
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$lesioni_T18[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV14"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV28"] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID == "MAV34"] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV09"] <- 0
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV14"] <- 0
+merge_metadata$cortisone_T18[merge_metadata$ID == "MAV28"] <- 0
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV12"] <- "No"
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV15"] <- "No"
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV25"] <- "No"
+merge_metadata$lesioni_T24[merge_metadata$ID == "MAV29"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV12"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV15"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV25"] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID == "MAV29"] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV09"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV12"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV15"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV25"] <- 0
+merge_metadata$cortisone_T24[merge_metadata$ID == "MAV29"] <- 0
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV24"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV24"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV24"] <- 0
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV09"] <- 0
+
+
+
+
 # salvo il merge come csv
 write.csv(merge_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv", row.names = FALSE)
 
