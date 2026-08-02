@@ -1772,6 +1772,113 @@ ggsurvplot(
   ylab = "NEDA-free survival"
 )
 
+
+
+
+
+###########
+#subtentorial x tesi #tutti mav stratificati
+##########
+merged_data <- merged_data %>%
+  mutate(
+    subtento = ifelse( subtentorial_lesions == "Yes", 1, 0),
+    sub_group = case_when(
+      subtento == 1 ~ "MAV subtentorial +",
+      subtento == 0 ~ "MAV subtentorial -"
+    )
+  )
+
+merged_data$therapy_group <- factor(
+  merged_data$sub_group,
+  levels = c("MAV subtentorial +", "MAV subtentorial -")
+)
+
+#=========================
+# Ultimo EDSS disponibile
+#=========================
+
+merged_data <- merged_data %>%
+  rowwise() %>%
+  mutate(
+    EDSS_last = {
+      x <- c(EDSS_T36, EDSS_T30, EDSS_T24,
+             EDSS_T18, EDSS_T12, EDSS_T6, EDSS_T0)
+      x[which(!is.na(x))[1]]
+    }
+  ) %>%
+  ungroup()
+
+#=========================
+# Peggioramento EDSS
+#=========================
+
+merged_data <- merged_data %>%
+  mutate(
+    EDSS_worsening = case_when(
+      EDSS_T0 == 0 ~ (EDSS_last - EDSS_T0) >= 1.5,
+      EDSS_T0 >= 1 & EDSS_T0 <= 5 ~ (EDSS_last - EDSS_T0) >= 1,
+      EDSS_T0 > 5 ~ (EDSS_last - EDSS_T0) >= 0.5,
+      TRUE ~ FALSE
+    )
+  )
+
+#=========================
+# Eventi NEDA
+#=========================
+
+merged_data <- merged_data %>%
+  mutate(
+    event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
+    event_12_C = EDSS_worsening | relapse_T12 == "Yes" | lesioni_T12 == "Yes",
+    event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
+    event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
+    event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
+  )
+
+#=========================
+# Tempo al primo evento
+#=========================
+
+merged_data <- merged_data %>%
+  mutate(
+    event_time_C = case_when(
+      event_6_C  ~ 6,
+      event_12_C ~ 12,
+      event_18_C ~ 18,
+      event_24_C ~ 24,
+      event_30_C ~ 30,
+      event_36_C ~ 36,
+      TRUE ~ NA_real_
+    ),
+    event_status_C = ifelse(is.na(event_time_C), 0, 1),
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
+  )
+
+#=========================
+# Kaplan-Meier
+#=========================
+
+surv_obj <- Surv(time = merged_data$time_C,
+                 event = merged_data$event_status_C)
+
+fit <- survfit(surv_obj ~ sub_group, data = merged_data)
+
+ggsurvplot(
+  fit,
+  data = merged_data,
+  risk.table = TRUE,
+  pval = TRUE,
+  conf.int = FALSE,
+  title= "NEDA-3 survival curve for Mavenclad patients stratified by subtentorial lesions",
+  legend.title = "Groups",
+  legend.labs= c("MAV subtentorial lesions -", "MAV subtentorial lesions +"),
+    xlab = "Months",
+  ylab = "NEDA-free survival"
+)
+
+
+
 ```
 
 Survival plot NEDA-3, stratified by sex:

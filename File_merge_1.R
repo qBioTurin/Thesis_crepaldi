@@ -633,6 +633,8 @@ merge_metadata$cortisone_T30[merge_metadata$ID == "MAV24"] <- 0
 merge_metadata$lesioni_T36[merge_metadata$ID == "MAV09"] <- "No"
 merge_metadata$relapse_T36[merge_metadata$ID == "MAV09"] <- "No"
 merge_metadata$cortisone_T36[merge_metadata$ID == "MAV09"] <- 0
+merge_metadata[merge_metadata$ID == "MAV32", c("bmi", "smoking_activity", "physical_activity")] <- list(33.20, "Yes", "sedentary")
+merge_metadata[merge_metadata$ID == "MAV31", c("bmi", "smoking_activity", "physical_activity")] <- list(27.43, "No", "sedentary")
 
 
 
