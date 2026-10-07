@@ -1,5 +1,5 @@
 source("Libraries.R")
-
+#filtro il dataset da mettere sull'app che deve corrispondere all'id dei sequenziamenti
 modified_metadata <- read.csv("Input/merged_data.csv")
 
 batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx",skip = 1) %>%
@@ -58,7 +58,7 @@ modified_metadata <- modified_metadata %>%
 
 
 
-#mettere in ordine nei grafici app
+#mettere in ordine nei grafici app aggiungendo lo 0 perchè non supporta la decisione dell'ordine
 modified_metadata$id <- replace(
   modified_metadata$id,
   modified_metadata$id %in% c("MAV05T3","MAV07T3","MAV09T3","MAV11T3","MAV13T3","MAV14T3","MAV17T3","MAV18T3","MAV23T3","MAV26T3","MAV27T3","MAV28T3","MAV29T3","MAV30T3","MAV31T3","MAV32T3","MAV34T3"),
@@ -68,15 +68,14 @@ modified_metadata$id <- replace(
 modified_metadata <- modified_metadata %>%
   mutate(
     medas_group = if_else(MEDAS >= 46, "High_adherence", "Low_adherence"),
-    bmi_group = if_else(bmi >= 24, "High_bmi", "Low_bmi")
-  )
+    bmi_group = if_else(bmi >= 24, "High_bmi", "Low_bmi"))
 
 ###scrivi file csv come input per app
 write.csv(modified_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/modified_metadata.csv", row.names = FALSE)
 
 
 ############
-#creazione dataset con t3 e t15 uniti per fare la beta diversity
+#creazione dataset con t3 e t15 uniti per fare la beta diversity di prova
 ######
 modified_metadata <- read.csv("Input/merged_data.csv")
 
@@ -159,8 +158,8 @@ write.csv(modified_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/The
 
 
 
-##-----------------------------------------------
-######dataset con anche i sani############
+##-----------------------------------------------##
+######dataset con anche i sani per MAV vs HD############
 
 merged_data <- read.csv("Input/merged_data.csv")
 
@@ -197,8 +196,7 @@ cols_keep <- c(
   "sex",
   "bmi",
   "age_at_t0",
-  "sequencing_batch"
-)
+  "sequencing_batch")
 
 merged_data_reduced <- merged_data %>%
   select(any_of(cols_keep))
@@ -237,8 +235,7 @@ merged_data_complete <- merged_data_complete %>%
     "MAV22",
     "MAV24",
     "MAV25",
-    "MAV31"
-  ))
+    "MAV31"))
 
 ## aggiungi T0 ai pazienti
 merged_data_complete <- merged_data_complete %>%
@@ -255,8 +252,8 @@ merged_data_complete <- merged_data_complete %>%
   mutate(
     group = if_else(
       startsWith(id, "MAV"),
-      "Affected",
-      "Healthy"
+      "MS patients",
+      "Healthy donors"
     )
   )
 merged_data_complete <- merged_data_complete %>%
@@ -271,9 +268,9 @@ write.csv(merged_data_complete, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/
 
 
 ###########################################
-#tenendo anche T24 e T36
+#tenendo anche T24 e T36 per prova prof rolla paper da pubblicare
 ###############################
-###### dataset con anche i sani ############
+###### dataset con anche i sani 
 modified_metadata <- read.csv("Input/merged_data.csv")
 
 batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx",skip = 1) %>%

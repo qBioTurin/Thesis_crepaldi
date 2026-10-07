@@ -1,5 +1,6 @@
 source("Libraries.R")
 
+#codice di prova dell'analisi per app, con solo 7 pazienti di cui ho già il sequenziamento, in modo da provare a scrivere già il codice in attesa dei campioni totali
 merged_data <- read.csv("Input/merged_data.csv")
 
 batch_data <- readxl::read_excel("Input/batch_sequenziamento.xlsx",skip = 1) %>%
@@ -22,15 +23,12 @@ filtered_patients <- filtered_patients %>%
   mutate(tp = factor(tp, levels = c("T0", "T3", "T12"))) %>%
   arrange(ID, tp) %>%
   group_by(ID) %>%
-  mutate(
-    EDSS_trend = case_when(
+  mutate(EDSS_trend = case_when(
       tp != "T3" ~ NA_character_,
       EDSS[tp == "T12"] == EDSS[tp == "T0"] ~ "stable",
       EDSS[tp == "T12"] > EDSS[tp == "T0"]  ~ "worsening",
       EDSS[tp == "T12"] < EDSS[tp == "T0"]  ~ "improvement",
-      TRUE ~ NA_character_
-    )
-  ) %>%
+      TRUE ~ NA_character_)) %>%
   ungroup() %>%
   mutate(sample = paste0(ID, tp)) %>%
   rename(original = ID) %>%
@@ -39,7 +37,6 @@ filtered_patients <- filtered_patients %>%
   select(where(~ !all(is.na(.)))) %>%
   select(-sequencing_batch) %>%
   left_join(batch_data, by = "id")
-
 
 
 write.csv(filtered_patients, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/filtered_patients.csv", row.names = FALSE)

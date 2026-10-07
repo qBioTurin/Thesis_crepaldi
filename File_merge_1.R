@@ -2,24 +2,18 @@ source("Libraries.R")
 metadata_pazienti_lesioni <- read_excel("Input/metadati_pazienti_Alessandro.xlsx")
 metadata_paper <- read.csv("Input/metadata_paper.csv")
 dati_filtrati_pazienti <- metadata_pazienti_lesioni[startsWith(metadata_pazienti_lesioni$ID, "MAV"), ]
+
 # metto le date come date anno-mese-giorno
 str(dati_filtrati_pazienti)
-# queste sono le date in chr
-dati_filtrati_pazienti$data_prelievo_T0 <- as.numeric(dati_filtrati_pazienti$data_prelievo_T0)
-dati_filtrati_pazienti$data_prelievo_T0 <- as.Date(dati_filtrati_pazienti$data_prelievo_T0, origin = "1899-12-30")
-dati_filtrati_pazienti$data_referto_T12 <- as.numeric(dati_filtrati_pazienti$data_referto_T12)
-dati_filtrati_pazienti$data_referto_T12 <- as.Date(dati_filtrati_pazienti$data_referto_T12, origin = "1899-12-30")
-dati_filtrati_pazienti$data_referto_T24 <- as.numeric(dati_filtrati_pazienti$data_referto_T24)
-dati_filtrati_pazienti$data_referto_T24 <- as.Date(dati_filtrati_pazienti$data_referto_T24, origin = "1899-12-30")
-dati_filtrati_pazienti$data_cambio_terapia <- as.numeric(dati_filtrati_pazienti$data_cambio_terapia)
-dati_filtrati_pazienti$data_cambio_terapia <- as.Date(dati_filtrati_pazienti$data_cambio_terapia, origin = "1899-12-30")
+# Conversione delle date in formato Excel
+date_excel <- c("data_prelievo_T0", "data_referto_T12", "data_referto_T24", "data_cambio_terapia")
+dati_filtrati_pazienti[date_excel] <- lapply(dati_filtrati_pazienti[date_excel],function(x) as.Date(as.numeric(x), origin = "1899-12-30"))
 
-# queste sono le date in posixct
-dati_filtrati_pazienti$`data di nascita` <- as.Date(dati_filtrati_pazienti$`data di nascita`)
-dati_filtrati_pazienti$data_referto_T6 <- as.Date(dati_filtrati_pazienti$data_referto_T6)
-dati_filtrati_pazienti$data_referto_T18 <- as.Date(dati_filtrati_pazienti$data_referto_T18)
-dati_filtrati_pazienti$data_referto_T30 <- as.Date(dati_filtrati_pazienti$data_referto_T30)
-dati_filtrati_pazienti$data_referto_T36 <- as.Date(dati_filtrati_pazienti$data_referto_T36)
+# Conversione delle date da POSIXct a Date
+date_posixct <- c("data di nascita", "data_referto_T6", "data_referto_T18", "data_referto_T30", "data_referto_T36")
+
+dati_filtrati_pazienti[date_posixct] <- lapply(dati_filtrati_pazienti[date_posixct], as.Date)
+
 # date numeriche
 dati_filtrati_pazienti$`DATA ESORDIO` <- as.Date(dati_filtrati_pazienti$`DATA ESORDIO`, origin = "1899-12-30")
 dati_filtrati_pazienti$data_diagnosi <- as.Date(dati_filtrati_pazienti$data_diagnosi, origin = "1899-12-30")
@@ -193,17 +187,22 @@ merge_metadata[merge_metadata$ID %in% c("MAV08", "MAV22"), "sex"] <- "M"
 merge_metadata[, c("ID", "sex")] # per controllare
 
 # completo la colonna age (at t0)
+# Completo la colonna age (at T0)
 merge_metadata$ID[is.na(merge_metadata$age)]
-merge_metadata[merge_metadata$ID == "MAV07", "age"] <- 42
-merge_metadata[merge_metadata$ID == "MAV08", "age"] <- 36
-merge_metadata[merge_metadata$ID == "MAV12", "age"] <- 36
-merge_metadata[merge_metadata$ID == "MAV15", "age"] <- 48
-merge_metadata[merge_metadata$ID == "MAV16", "age"] <- 55
-merge_metadata[merge_metadata$ID == "MAV20", "age"] <- 49
-merge_metadata[merge_metadata$ID == "MAV22", "age"] <- 39
-merge_metadata[merge_metadata$ID == "MAV23", "age"] <- 52
-merge_metadata[merge_metadata$ID == "MAV24", "age"] <- 35
-merge_metadata[merge_metadata$ID == "MAV25", "age"] <- 42
+age_values <- c(
+  MAV07 = 42,
+  MAV08 = 36,
+  MAV12 = 36,
+  MAV15 = 48,
+  MAV16 = 55,
+  MAV20 = 49,
+  MAV22 = 39,
+  MAV23 = 52,
+  MAV24 = 35,
+  MAV25 = 42
+)
+
+merge_metadata$age[match(names(age_values), merge_metadata$ID)] <- age_values
 
 # cambio nome alla colonna age in age_at_t0
 names(merge_metadata)[names(merge_metadata) == "age"] <- "age_at_t0"
@@ -236,7 +235,7 @@ merge_metadata[merge_metadata$ID == "MAV31", "MEDAS"] <- 57
 
 merge_metadata[merge_metadata$ID == "MAV23", c("bmi", "smoking_habit", "physical_activity")] <- list(20.43, "No", "active")
 
-### DA CONFERMARE!!!!! aggiungo dati nuovi da NAPOLI 
+### aggiungo dati nuovi da NAPOLI 
 merge_metadata <- merge_metadata %>%
   mutate(
     across(
@@ -288,21 +287,17 @@ merge_metadata[edss_cols] <- t(apply(merge_metadata[edss_cols], 1, function(x){
   # indice dell'ultima osservazione non mancante
   last_obs <- tail(which(!is.na(x)), 1)
   
-  # se tutte NA o una sola osservazione, restituisce la riga invariata
   if(length(last_obs) == 0 || last_obs == 1)
     return(x)
   
-  # LOCF solo fino all'ultima osservazione disponibile
+  # completa solo fino all'ultima osservazione disponibile #codice suggerito
   for(i in 2:last_obs){
     if(is.na(x[i])){
       x[i] <- x[i-1]
     }
   }
-  
   x
 }))
-
-
 
 # MAV22: T18 e T24 devono rimanere NA
 merge_metadata[merge_metadata$ID == "MAV22", c("EDSS_T0", "EDSS_T6")] <- NA
@@ -566,80 +561,46 @@ merge_metadata[merge_metadata$ID == "MAV24", c("gc_treatment","lesion_burden", "
 merge_metadata[merge_metadata$ID == "MAV25", c("lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Yes", "Yes", "No", "Yes")
 merge_metadata[merge_metadata$ID == "MAV26", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Negative", "No", "No", "Yes", "Yes")
 merge_metadata[merge_metadata$ID == "MAV12", c("gc_treatment","lesion_burden", "bone_marrow_lesions", "subtentorial_lesions", "gadolinium_contrast")] <- list("Negative", "Yes", "Yes", "Yes", "Yes")
-
-merge_metadata$relapse_T12[merge_metadata$ID == "MAV16"] <- "No"
-merge_metadata$relapse_T12[merge_metadata$ID == "MAV23"] <- "No"
-merge_metadata$relapse_T12[merge_metadata$ID == "MAV24"] <- "No"
-merge_metadata$lesioni_T12[merge_metadata$ID == "MAV16"] <- "No"
-merge_metadata$lesioni_T12[merge_metadata$ID == "MAV23"] <- "No"
-merge_metadata$lesioni_T12[merge_metadata$ID == "MAV24"] <- "No"
-merge_metadata$cortisone_T12[merge_metadata$ID == "MAV16"] <- 0
-merge_metadata$cortisone_T12[merge_metadata$ID == "MAV23"] <- 0
-merge_metadata$cortisone_T12[merge_metadata$ID == "MAV24"] <- 0
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV14"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV15"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV16"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV17"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV22"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV28"] <- "No"
-merge_metadata$lesioni_T6[merge_metadata$ID == "MAV34"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV10"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV14"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV15"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV16"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV17"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV22"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV28"] <- "No"
-merge_metadata$relapse_T6[merge_metadata$ID == "MAV34"] <- "No"
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV09"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV10"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV14"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV15"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV16"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV17"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV22"] <- 0
-merge_metadata$cortisone_T6[merge_metadata$ID == "MAV28"] <- 0
-
-merge_metadata$lesioni_T18[merge_metadata$ID == "MAV14"] <- "No"
-merge_metadata$lesioni_T18[merge_metadata$ID == "MAV28"] <- "No"
-merge_metadata$lesioni_T18[merge_metadata$ID == "MAV34"] <- "No"
-merge_metadata$relapse_T18[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$relapse_T18[merge_metadata$ID == "MAV14"] <- "No"
-merge_metadata$relapse_T18[merge_metadata$ID == "MAV28"] <- "No"
-merge_metadata$relapse_T18[merge_metadata$ID == "MAV34"] <- "No"
-merge_metadata$cortisone_T18[merge_metadata$ID == "MAV09"] <- 0
-merge_metadata$cortisone_T18[merge_metadata$ID == "MAV14"] <- 0
-merge_metadata$cortisone_T18[merge_metadata$ID == "MAV28"] <- 0
-merge_metadata$lesioni_T24[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$lesioni_T24[merge_metadata$ID == "MAV12"] <- "No"
-merge_metadata$lesioni_T24[merge_metadata$ID == "MAV15"] <- "No"
-merge_metadata$lesioni_T24[merge_metadata$ID == "MAV25"] <- "No"
-merge_metadata$lesioni_T24[merge_metadata$ID == "MAV29"] <- "No"
-merge_metadata$relapse_T24[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$relapse_T24[merge_metadata$ID == "MAV12"] <- "No"
-merge_metadata$relapse_T24[merge_metadata$ID == "MAV15"] <- "No"
-merge_metadata$relapse_T24[merge_metadata$ID == "MAV25"] <- "No"
-merge_metadata$relapse_T24[merge_metadata$ID == "MAV29"] <- "No"
-merge_metadata$cortisone_T24[merge_metadata$ID == "MAV09"] <- 0
-merge_metadata$cortisone_T24[merge_metadata$ID == "MAV12"] <- 0
-merge_metadata$cortisone_T24[merge_metadata$ID == "MAV15"] <- 0
-merge_metadata$cortisone_T24[merge_metadata$ID == "MAV25"] <- 0
-merge_metadata$cortisone_T24[merge_metadata$ID == "MAV29"] <- 0
-merge_metadata$lesioni_T30[merge_metadata$ID == "MAV24"] <- "No"
-merge_metadata$relapse_T30[merge_metadata$ID == "MAV24"] <- "No"
-merge_metadata$cortisone_T30[merge_metadata$ID == "MAV24"] <- 0
-merge_metadata$lesioni_T36[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$relapse_T36[merge_metadata$ID == "MAV09"] <- "No"
-merge_metadata$cortisone_T36[merge_metadata$ID == "MAV09"] <- 0
 merge_metadata[merge_metadata$ID == "MAV32", c("bmi", "smoking_activity", "physical_activity")] <- list(33.20, "Yes", "sedentary")
 merge_metadata[merge_metadata$ID == "MAV31", c("bmi", "smoking_activity", "physical_activity")] <- list(27.43, "No", "sedentary")
 
+
+# T12
+merge_metadata$relapse_T12[merge_metadata$ID %in% c("MAV16", "MAV23", "MAV24")] <- "No"
+merge_metadata$lesioni_T12[merge_metadata$ID %in% c("MAV16", "MAV23", "MAV24")] <- "No"
+merge_metadata$cortisone_T12[merge_metadata$ID %in% c("MAV16", "MAV23", "MAV24")] <- 0
+
+
+# T6
+merge_metadata$lesioni_T6[merge_metadata$ID %in% c("MAV09", "MAV14", "MAV15", "MAV16", "MAV17", "MAV22", "MAV28", "MAV34")] <- "No"
+merge_metadata$relapse_T6[merge_metadata$ID %in% c("MAV09", "MAV10", "MAV14", "MAV15", "MAV16", "MAV17", "MAV22", "MAV28", "MAV34")] <- "No"
+merge_metadata$cortisone_T6[merge_metadata$ID %in% c("MAV09", "MAV10", "MAV14", "MAV15", "MAV16", "MAV17", "MAV22", "MAV28")] <- 0
+
+
+# T18
+merge_metadata$lesioni_T18[merge_metadata$ID %in% c("MAV14", "MAV28", "MAV34")] <- "No"
+merge_metadata$relapse_T18[merge_metadata$ID %in% c("MAV09", "MAV14", "MAV28", "MAV34")] <- "No"
+merge_metadata$cortisone_T18[merge_metadata$ID %in% c("MAV09", "MAV14", "MAV28")] <- 0
+
+
+# T24
+merge_metadata$lesioni_T24[merge_metadata$ID %in% c("MAV09", "MAV12", "MAV15", "MAV25", "MAV29")] <- "No"
+merge_metadata$relapse_T24[merge_metadata$ID %in% c("MAV09", "MAV12", "MAV15", "MAV25", "MAV29")] <- "No"
+merge_metadata$cortisone_T24[merge_metadata$ID %in% c("MAV09", "MAV12", "MAV15", "MAV25", "MAV29")] <- 0
+
+
+# T30
+merge_metadata$lesioni_T30[merge_metadata$ID == "MAV24"] <- "No"
+merge_metadata$relapse_T30[merge_metadata$ID == "MAV24"] <- "No"
+merge_metadata$cortisone_T30[merge_metadata$ID == "MAV24"] <- 0
+
+
+# T36
+merge_metadata$lesioni_T36[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$relapse_T36[merge_metadata$ID == "MAV09"] <- "No"
+merge_metadata$cortisone_T36[merge_metadata$ID == "MAV09"] <- 0
 
 
 
 # salvo il merge come csv
 write.csv(merge_metadata, "C:/Users/gialu/Desktop/tesi_magistrale/Git.hub/Thesis_crepaldi/Input/merged_data.csv", row.names = FALSE)
-
-

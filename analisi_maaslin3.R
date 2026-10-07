@@ -13,7 +13,7 @@ main_el= "tp"
 confunders = c("sex", "bmi", "age_at_t0")
 output_folder= "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/risultati_maaslin_eukaryota"
 
-#QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
+#carico rds
 rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
 otu <- rds@otu_table
 taxa <- rds@tax_table
@@ -38,11 +38,10 @@ rownames(merged_df) <- merged_df$Genus_Species
 merged_df <- merged_df %>% select(-c(taxid, Genus_Species))
 merged_df <- t(merged_df)
 
-metadata_df$tp <- factor(
-  as.character(metadata_df$tp),
+#qui modifico solo le variabili che mi servono come riferimento e confunders
+metadata_df$tp <- factor(as.character(metadata_df$tp),
   levels = c("T0", "T3", "T12", "T15", "T24", "T36"),
-  ordered = FALSE
-)
+  ordered = FALSE)
 unique(metadata_df$tp)
 metadata_df$sex = as.factor(metadata_df$sex)
 levels(metadata_df$sex) = c("M", "F")
@@ -65,8 +64,9 @@ discr_els_formatted <- unlist(lapply(confunders, function(d) {
   }
 }))
 
-##for stability of results across runs
+#formula
 formulaInUse_fin = paste0("~ ",formulaInUse, "+(1|original)")
+##per la stabilità tra i run (pezzo di francesco)
 set.seed(2204)
 median_comparison_abundance_in = FALSE
 fx_effects = NULL
@@ -110,10 +110,10 @@ fit_out <- maaslin3(
 
 main_el = "group"
 confunders = c("sex", "bmi", "age_at_t0")
-output_folder = "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_app_healty_plus_MAV/Risultati_maaslin_complete_eukaryota"
+output_folder = "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_app_healty_plus_MAV/Risultati_maaslin_complete_bacteria"
 
-# QUI CAMBIA IL PERCORSO DELL'RDS DI INTERESSE
-rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\shared_results\\SUPERVISED_DEC\\Eukaryota_Supervised_decontam.rds")
+#carico rds batteri, archeae, eukaryoti 
+rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
 
 otu <- rds@otu_table
 taxa <- rds@tax_table
@@ -137,18 +137,16 @@ rownames(merged_df) <- merged_df$Genus_Species
 merged_df <- merged_df %>%
   select(-c(taxid, Genus_Species))
 
-# trasposizione (righe = campioni, colonne = taxa)
 merged_df <- t(merged_df)
 
-# GROUP come factor
+# GROUP come factor per avere riferimento sani
 metadata_df$group <- factor(
   as.character(metadata_df$group),
   levels = c("Healthy", "Affected"),
-  ordered = FALSE
-)
+  ordered = FALSE)
 unique(metadata_df$group)
 
-# sex factor
+# sex factor confunders (bmi e age già a posto)
 metadata_df$sex = as.factor(metadata_df$sex)
 levels(metadata_df$sex) = c("M", "F")
 
@@ -181,9 +179,9 @@ discr_els_formatted <- unlist(
   })
 )
 
-#formula finale (nessun random effect: qui non c'e' ripetizione di soggetto
+#formula finale (nessun random effect perchè qui non c'e' ripetizione di soggetto)
 formulaInUse_fin = paste0("~ ", formulaInUse)
-
+#per non farlo bloccare e continuità tra le run
 set.seed(2204)
 median_comparison_abundance_in = FALSE
 fx_effects = NULL
@@ -246,6 +244,7 @@ fit_out <- maaslin3(
 )
 
 
-
+###le heatmap alla fine le ho rifatte a mano
+###summary plot della nuova versione di maaslin sono troppo confusionari con i confunders oltre che il riferimento, li rifaccio a mano
 
 

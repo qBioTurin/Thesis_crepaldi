@@ -27,9 +27,9 @@ cols_factor <- c("lesioni_T6", "relapse_T6", "lesioni_T12", "relapse_T12",
                 "lesioni_T30", "relapse_T30", "lesioni_T36", "relapse_T36",
                 "cambio_terapia", "lesion_burden", "bone_marrow_lesions",
                 "subtentorial_lesions", "gadolinium_contrast", "full_recovery", "naive", "smoking_habit", "antibiotic_use", "spike_in")
+
 merged_data <- merged_data %>%
-  mutate(
-    across(all_of(cols_factor), ~ case_when(
+  mutate(across(all_of(cols_factor), ~ case_when(
       .x %in% c("No", "no", "0", 0) ~ "No",
       .x %in% c("Yes", "yes", "1", 1) ~ "Yes",
       TRUE ~ NA_character_
@@ -71,13 +71,7 @@ edss_long <- merged_data %>%
     values_to = "EDSS"
   ) %>%
   filter(!is.na(EDSS))%>%
-  mutate(
-    timepoint = factor(
-      timepoint,
-      levels = paste0("EDSS_T", c(0, 6, 12, 18, 24, 30, 36)),
-      labels = paste0("T", c(0, 6, 12, 18, 24, 30, 36))
-    )
-  )
+  mutate(timepoint = factor(timepoint, levels = paste0("EDSS_T", c(0, 6, 12, 18, 24, 30, 36)), labels = paste0("T", c(0, 6, 12, 18, 24, 30, 36))))
 
 # Ultimo timepoint di ciascun paziente
 last_points <- edss_long %>%
@@ -87,10 +81,8 @@ last_points <- edss_long %>%
 
 # Creo grafico
 ggplot(edss_long, aes(x = timepoint, y = EDSS, group = ID)) +
-
-  # Linee dei singoli pazienti
+# Linee dei singoli pazienti
   geom_line(aes(color = ID), alpha = 0.6, size = 0.6) +
-
   # Punti con jitter orizzontale e verticale
   geom_point(
     aes(color = ID),
@@ -99,104 +91,70 @@ ggplot(edss_long, aes(x = timepoint, y = EDSS, group = ID)) +
     position = position_jitter(
       width = 0.1,
       height = 0.08,
-      seed = 42
-    )
-  ) +
-
+      seed = 42)) +
   # Evidenzia l'ultimo punto con forma diversa se cambio terapia
-  geom_point(
-    data = last_points,
-    aes(color = ID, shape = cambio_terapia),
-    size = 3
-  ) +
-
+  geom_point(data = last_points, aes(color = ID, shape = cambio_terapia), size = 3) +
   # Etichette ID
-  geom_text_repel(
-    data = last_points,
-    aes(label = ID, color = ID),
+  geom_text_repel(data = last_points, aes(label = ID, color = ID),
     size = 3,
     fontface = "bold",
     nudge_x = 0.2,
     segment.alpha = 0,
-    show.legend = FALSE
-  ) +
-
+    show.legend = FALSE) +
   # Media della coorte
-  stat_summary(
-    aes(group = 1),
+  stat_summary(aes(group = 1),
     fun = mean,
     geom = "line",
     size = 1.3,
-    color = "black"
-  ) +
-
-  stat_summary(
-    aes(group = 1),
+    color = "black") +
+  stat_summary(aes(group = 1),
     fun = mean,
     geom = "point",
     size = 2.5,
     color = "black",
-    shape = 18
-  ) +
-
+    shape = 18) +
   # Colori
-  scale_color_manual(
-    values = as.vector(pals::polychrome(length(unique(edss_long$ID)))),
-    guide = "none"
-  ) +
-
+  scale_color_manual(values = as.vector(pals::polychrome(length(unique(edss_long$ID)))), guide = "none") +
   # Forma ultimo punto
-  scale_shape_manual(
-    values = c(
-      "No" = 16,   # cerchio
-      "Yes" = 17   # stella
-    ),
-    name = "Therapy switch"
-  ) +
-
+  scale_shape_manual(values = c("No" = 16,   # cerchio
+                                "Yes" = 17 ),  # stella
+    name = "Therapy switch") +
   labs(
     title = "EDSS Progression Over Time",
     subtitle = "Black: cohort average | Coloured: each MAV patient",
     x = "Timepoints",
-    y = "EDSS value"
-  ) +
-
+    y = "EDSS value") +
   theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
     axis.title = element_text(face = "bold"),
     plot.title = element_text(face = "bold", size = 14),
     plot.subtitle = element_text(color = "grey30"),
-    plot.margin = margin(10, 40, 10, 10)
-  )
+    plot.margin = margin(10, 40, 10, 10))
 ```
 EDSS trend for each MAV patient, Sankey plot:
 ```{r sankey}
 ####sankey interattivo mettendo EDSS in categorie (altrimenti vengono troppi incroci)
+
 # Classi EDSS
 sankey_data <- merged_data %>%
-  transmute(
-    ID,
+  transmute(ID,
     T0 = case_when(
       EDSS_T0 < 3 ~ "<3",
       EDSS_T0 < 6 ~ "3-5.5",
-      TRUE ~ "≥6"
-    ),
+      TRUE ~ "≥6"),
     T6 = case_when(
       EDSS_T6 < 3 ~ "<3",
       EDSS_T6 < 6 ~ "3-5.5",
-      TRUE ~ "≥6"
-    ),
+      TRUE ~ "≥6"),
     T12 = case_when(
       EDSS_T12 < 3 ~ "<3",
       EDSS_T12 < 6 ~ "3-5.5",
-      TRUE ~ "≥6"
-    ),
+      TRUE ~ "≥6"),
     T18 = case_when(
       EDSS_T18 < 3 ~ "<3",
       EDSS_T18 < 6 ~ "3-5.5",
-      TRUE ~ "≥6"
-    ),
+      TRUE ~ "≥6"),
     T24 = case_when(
       EDSS_T24 < 3 ~ "<3",
       EDSS_T24 < 6 ~ "3-5.5",
@@ -205,13 +163,11 @@ sankey_data <- merged_data %>%
     T30 = case_when(
       EDSS_T30 < 3 ~ "<3",
       EDSS_T30 < 6 ~ "3-5.5",
-      TRUE ~ "≥6"
-    ),
+      TRUE ~ "≥6"),
     T36 = case_when(
       EDSS_T36 < 3 ~ "<3",
       EDSS_T36 < 6 ~ "3-5.5",
-      TRUE ~ "≥6"
-    )
+      TRUE ~ "≥6")
   )
 
 links <- bind_rows(
@@ -220,8 +176,7 @@ links <- bind_rows(
   sankey_data %>% count(T12, T18) %>% rename(source=T12,target=T18,value=n),
   sankey_data %>% count(T18, T24) %>% rename(source=T18,target=T24,value=n),
   sankey_data %>% count(T24, T30) %>% rename(source=T24,target=T30,value=n),
-  sankey_data %>% count(T30, T36) %>% rename(source=T30,target=T36,value=n)
-)
+  sankey_data %>% count(T30, T36) %>% rename(source=T30,target=T36,value=n))
 
 links <- bind_rows(
   sankey_data %>% transmute(source=paste0("T0_",T0), target=paste0("T6_",T6)),
@@ -229,13 +184,10 @@ links <- bind_rows(
   sankey_data %>% transmute(source=paste0("T12_",T12), target=paste0("T18_",T18)),
   sankey_data %>% transmute(source=paste0("T18_",T18), target=paste0("T24_",T24)),
   sankey_data %>% transmute(source=paste0("T24_",T24), target=paste0("T30_",T30)),
-  sankey_data %>% transmute(source=paste0("T30_",T30), target=paste0("T36_",T36))
-) %>%
+  sankey_data %>% transmute(source=paste0("T30_",T30), target=paste0("T36_",T36))) %>%
   count(source, target, name="value")
 
-nodes <- data.frame(
-  name = unique(c(links$source, links$target))
-)
+nodes <- data.frame(name = unique(c(links$source, links$target)))
 
 links$source <- match(links$source, nodes$name) - 1
 links$target <- match(links$target, nodes$name) - 1
@@ -248,8 +200,98 @@ sankeyNetwork(
   Value = "value",
   NodeID = "name",
   fontSize = 12,
-  nodeWidth = 25
-)
+  nodeWidth = 25)
+
+
+ ###################################################
+ #sankey con fasce di edss che si fermano dove incontrano na per quel paziente
+ sankey_long <- merged_data %>%
+   transmute(
+     ID,
+     T0 = case_when(
+       EDSS_T0 < 3 ~ "<3",
+       EDSS_T0 < 6 ~ "3-5.5",
+       EDSS_T0 >= 6 ~ "≥6"),
+     T6 = case_when(
+       EDSS_T6 < 3 ~ "<3",
+       EDSS_T6 < 6 ~ "3-5.5",
+       EDSS_T6 >= 6 ~ "≥6"),
+     T12 = case_when(
+       EDSS_T12 < 3 ~ "<3",
+       EDSS_T12 < 6 ~ "3-5.5",
+       EDSS_T12 >= 6 ~ "≥6"),
+     T18 = case_when(
+       EDSS_T18 < 3 ~ "<3",
+       EDSS_T18 < 6 ~ "3-5.5",
+       EDSS_T18 >= 6 ~ "≥6"),
+     T24 = case_when(
+       EDSS_T24 < 3 ~ "<3",
+       EDSS_T24 < 6 ~ "3-5.5",
+       EDSS_T24 >= 6 ~ "≥6"),
+     T30 = case_when(
+       EDSS_T30 < 3 ~ "<3",
+       EDSS_T30 < 6 ~ "3-5.5",
+       EDSS_T30 >= 6 ~ "≥6"),
+     T36 = case_when(
+       EDSS_T36 < 3 ~ "<3",
+       EDSS_T36 < 6 ~ "3-5.5",
+       EDSS_T36 >= 6 ~ "≥6")) %>%
+   pivot_longer(-ID, names_to = "time", values_to = "band") %>%
+   mutate(time = factor(time, levels = c("T0","T6","T12","T18","T24","T30","T36"))) %>%
+   arrange(ID, time) %>%
+   group_by(ID) %>%
+   filter(cumsum(is.na(band)) == 0) %>%   # tiene le osservazioni fino al primo NA (escluso)
+   ungroup()
+ 
+ links <- sankey_long %>%
+   group_by(ID) %>%
+   mutate(source = paste0(time, "_", band), target = lead(paste0(time, "_", band))) %>%
+   ungroup() %>%
+   filter(!is.na(target)) %>%        # l'ultima osservazione di ogni paziente non genera link con altre
+   count(source, target, name = "value")
+ 
+ # Creazione nodi
+ nodes <- data.frame(name = unique(c(links$source, links$target))) %>%
+   separate(name, into = c("time", "edss"), sep = "_", remove = FALSE) %>%
+   mutate(
+     group = case_when(
+       grepl("≥6", edss)    ~ "≥6",
+       grepl("3-5.5", edss) ~ "3-5.5",
+       grepl("<3", edss)    ~ "<3"),
+     time = factor(time, levels = c("T0","T6","T12","T18","T24","T30","T36")),
+     group_order = factor(group, levels = c("≥6","3-5.5","<3"))) %>%
+   arrange(time, group_order) %>%
+   mutate(name = paste(time, edss, sep = "_")) %>%
+   select(name, group)
+ 
+ # Controllo
+ print(table(nodes$group))
+ 
+ # Rimappatura indici per ordine
+ links$source <- match(links$source, nodes$name) - 1
+ links$target <- match(links$target, nodes$name) - 1
+ 
+ # Assegna gruppo ai link in base al nodo di destinazione
+ links <- links %>%
+   mutate(group = nodes$group[target + 1])
+ 
+ # Sankey plot
+ sankeyNetwork(
+   Links = links,
+   Nodes = nodes,
+   Source = "source",
+   Target = "target",
+   Value = "value",
+   NodeID = "name",
+   NodeGroup = "group",
+   LinkGroup = "group",
+   fontSize = 12,
+   nodeWidth = 25,
+   colourScale = JS("d3.scaleOrdinal().domain(['≥6','3-5.5','<3']).range(['#E74C3C','#F1C40F','#2ECC71'])"), #comando di auri per far venire i colori in base alla gravità
+   nodePadding = 20,
+   iterations = 0,
+   sinksRight = FALSE
+ )
 
 ```
 
@@ -266,83 +308,53 @@ merged_data <- merged_data %>%
       as.numeric(as.character(EDSS_T18)),
       as.numeric(as.character(EDSS_T24)),
       as.numeric(as.character(EDSS_T30)),
-      as.numeric(as.character(EDSS_T36))
-    )))
-  ) %>%
+      as.numeric(as.character(EDSS_T36)))))) %>%
   ungroup()
 
 # Delta EDSS
 merged_data <- merged_data %>%
-  mutate(
-    EDSS_T0_num = as.numeric(as.character(EDSS_T0)),
-    delta_EDSS = EDSS_finale - EDSS_T0_num
-  )
+  mutate(EDSS_T0_num = as.numeric(as.character(EDSS_T0)), delta_EDSS = EDSS_finale - EDSS_T0_num)
 
 # Andamento EDSS
 merged_data <- merged_data %>%
   mutate(
     andamento_EDSS = case_when(
-
       EDSS_T0_num == 0 &
         delta_EDSS >= 1.5 ~ "EDSS worsening",
-
       EDSS_T0_num >= 1 &
         EDSS_T0_num <= 5.5 &
         delta_EDSS >= 1 ~ "EDSS worsening",
-
       EDSS_T0_num >= 6 &
         delta_EDSS >= 0.5 ~ "EDSS worsening",
-
       abs(delta_EDSS) < 0.5 &
         EDSS_T0_num < 3 ~ "Low stable",
-
       abs(delta_EDSS) < 0.5 &
         EDSS_T0_num >= 3 ~ "High stable",
-
       TRUE ~ NA_character_
     )
   )
 
 # Classe EDSS basale
 merged_data <- merged_data %>%
-  mutate(
-    EDSS_class = if_else(
-      EDSS_T0_num >= 3,
-      "EDSS ≥ 3",
-      "EDSS < 3"
-    )
-  )
+  mutate( EDSS_class = if_else(EDSS_T0_num >= 3, "EDSS ≥ 3","EDSS < 3"))
 
 plot_df <- merged_data %>%
   filter(!is.na(andamento_EDSS)) %>%
   count(andamento_EDSS, EDSS_class)
 
-ggplot(
-  plot_df,
-  aes(
+ggplot(plot_df,aes(
     x = andamento_EDSS,
     y = n,
-    fill = EDSS_class
-  )
-) +
-  geom_col(
-    position = "stack",
-    colour = "black"
-  ) +
-  scale_fill_manual(
-    values = c(
-      "EDSS < 3" = "darkblue",
-      "EDSS ≥ 3" = "lightblue"
-    )
-  ) +
+    fill = EDSS_class)) +
+  geom_col(position = "stack", colour = "black") +
+  scale_fill_manual(values = c("EDSS < 3" = "darkblue", "EDSS ≥ 3" = "lightblue")) +
   labs(
     x = "",
     y = "Number of MAV patients",
-    fill = "Baseline EDSS"
-  ) +
-  theme_classic()
+    fill = "Baseline EDSS") +  theme_classic()
 
 ########chord plot suggerito al posto dell'istogramma
+###-------> deciso di lasciare perdere
 #flussi
 chord_df <- plot_df %>%
   rename(
@@ -417,10 +429,7 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -431,10 +440,7 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
 # Eventi NEDA
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -442,13 +448,10 @@ merged_data <- merged_data %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_time_C = case_when(
@@ -466,8 +469,7 @@ merged_data <- merged_data %>%
 
 surv_obj4 <- Surv(
   time = merged_data$time_C,
-  event = merged_data$event_status_C
-)
+  event = merged_data$event_status_C)
 
 fit4 <- survfit(surv_obj4 ~ 1, data = merged_data)
 
@@ -488,7 +490,6 @@ NEDA-3 divided by type of disease activity:
 1. EDSS
 ``` {r survival_NEDA3_EDSS}
 ####EDSS - confrontando con neda3 ma sempre sul T0!!!!
-
 merged_data <- merged_data %>%
   rowwise() %>%
   mutate(
@@ -500,10 +501,7 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -514,24 +512,17 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
-# Survival (solo EDSS)
-#=========================
 
+# Survival (solo EDSS)
 merged_data <- merged_data %>%
   mutate(
     event_status_EDSS = ifelse(EDSS_worsening, 1, 0),
-    time_EDSS = ifelse(EDSS_worsening, 6, 36)
-  )
+    time_EDSS = ifelse(EDSS_worsening, 6, 36))
 
-#=========================
 # Kaplan-Meier
-#=========================
-
 surv_obj <- Surv(
   time = merged_data$time_EDSS,
-  event = merged_data$event_status_EDSS
-)
+  event = merged_data$event_status_EDSS)
 
 fit <- survfit(surv_obj ~ 1, data = merged_data)
 
@@ -547,8 +538,6 @@ ggsurvplot(
   xlab = "Months",
   ylab = "EDSS worsening-free survival"
 )
-
-
 
 ```
 2. Relapse
@@ -598,20 +587,17 @@ ggsurvplot(
 ```
 3. New lesions
 ``` {r survival_NEDA3_lesions}
-
+#lesioni
 merged_data <- merged_data %>%
   mutate(
-
     event_6_CT  = lesioni_T6  == "Yes",
     event_12_CT = lesioni_T12 == "Yes",
     event_18_CT = lesioni_T18 == "Yes",
     event_24_CT = lesioni_T24 == "Yes",
     event_30_CT = lesioni_T30 == "Yes",
     event_36_CT = lesioni_T36 == "Yes"
-
   ) %>%
   mutate(
-
     event_time_CT = case_when(
       event_6_CT  ~ 6,
       event_12_CT ~ 12,
@@ -621,12 +607,9 @@ merged_data <- merged_data %>%
       event_36_CT ~ 36,
       TRUE ~ NA_real_
     ),
-
     event_status_CT = if_else(is.na(event_time_CT), 0, 1),
-
     time_CT = if_else(is.na(event_time_CT), 36, event_time_CT)
   )
-
 surv_obj <- Surv(merged_data$time_CT, merged_data$event_status_CT)
 
 fit <- survfit(surv_obj ~ 1)
@@ -643,6 +626,7 @@ ggsurvplot(
   surv.median.line = "none",
   ggtheme = theme_minimal()
 )
+
 ```
 
 Survival plot NEDA-3, stratified by glucocorticoid treatment at baseline:
@@ -650,8 +634,7 @@ Survival plot NEDA-3, stratified by glucocorticoid treatment at baseline:
 
 #####gc survival senza i naive###!!!!!
 
-
-###plot ceci senza non naive
+###plot fatto con ceci senza non naive
 merged_data <- merged_data %>%
   mutate(
     gc = ifelse(gc_treatment == "Positive", 1, 0),
@@ -664,15 +647,12 @@ merged_data <- merged_data %>%
 
 merged_data$gc_group <- factor(
   merged_data$gc_group,
-  levels = c("MAV_GC+", "MAV_GC-")
-)
+  levels = c("MAV_GC+", "MAV_GC-"))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -684,10 +664,7 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -698,10 +675,7 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
 # Eventi NEDA
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -709,13 +683,10 @@ merged_data_naive <- merged_data_naive %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_time_C = case_when(
@@ -731,10 +702,8 @@ merged_data_naive <- merged_data_naive %>%
     time_C = ifelse(is.na(event_time_C), 36, event_time_C)
   )
 
-#=========================
-# Kaplan-Meier
-#=========================
 
+# Kaplan-Meier
 surv_obj <- Surv(time = merged_data_naive$time_C,
                  event = merged_data_naive$event_status_C)
 
@@ -757,10 +726,8 @@ NEDA-3 divided by type of disease activity, stratified by Glucocorticoid treatme
 1. EDSS
 ``` {r survival_GC_EDSS}
 #####con il neda di ceci
-#=========================
-# Gruppi GC
-#=========================
 
+# Gruppi GC
 merged_data_naive <- merged_data_naive %>%
   mutate(
     gc = ifelse(gc_treatment == "Positive", 1, 0),
@@ -775,10 +742,7 @@ merged_data_naive$gc_group <- factor(
   levels = c("MAV_GC+", "MAV_GC-")
 )
 
-#=========================
 # Ultimo EDSS disponibile
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -790,10 +754,8 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -804,29 +766,20 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Survival (solo EDSS)
-#=========================
 
+# Survival (solo EDSS)
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_status_EDSS = ifelse(EDSS_worsening, 1, 0),
     time_EDSS = ifelse(EDSS_worsening, 6, 36)
   )
 
-#=========================
 # Kaplan-Meier
-#=========================
-
 surv_obj <- Surv(
   time = merged_data_naive$time_EDSS,
-  event = merged_data_naive$event_status_EDSS
-)
+  event = merged_data_naive$event_status_EDSS)
 
-fit <- survfit(
-  surv_obj ~ gc_group,
-  data = merged_data_naive
-)
+fit <- survfit(surv_obj ~ gc_group, data = merged_data_naive)
 
 ggsurvplot(
   fit,
@@ -853,8 +806,7 @@ merged_data <- merged_data %>%
     event_18_2  = relapse_T18  == "Yes",
     event_24_2  = relapse_T24  == "Yes",
     event_30_2  = relapse_T30  == "Yes",
-    event_36_2  = relapse_T36  == "Yes"
-  )
+    event_36_2  = relapse_T36  == "Yes")
 
 merged_data <- merged_data %>%
   mutate(
@@ -865,12 +817,10 @@ merged_data <- merged_data %>%
       event_24_2  ~ 24,
       event_30_2  ~ 30,
       event_36_2  ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     
     event_status_2 = ifelse(is.na(event_time_2), 0, 1),
-    time_2 = ifelse(is.na(event_time_2), 36, event_time_2)
-  )
+    time_2 = ifelse(is.na(event_time_2), 36, event_time_2))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
@@ -901,8 +851,7 @@ merged_data <- merged_data %>%
     event_18_3  = lesioni_T18  == "Yes",
     event_24_3  = lesioni_T24  == "Yes",
     event_30_3  = lesioni_T30  == "Yes",
-    event_36_3  = lesioni_T36  == "Yes"
-  )
+    event_36_3  = lesioni_T36  == "Yes")
 
 merged_data <- merged_data %>%
   mutate(
@@ -913,12 +862,9 @@ merged_data <- merged_data %>%
       event_24_3  ~ 24,
       event_30_3  ~ 30,
       event_36_3  ~ 36,
-      TRUE ~ NA_real_
-    ),
-    
-    event_status_3 = ifelse(is.na(event_time_3), 0, 1),
-    time_3 = ifelse(is.na(event_time_3), 36, event_time_3)
-  )
+      TRUE ~ NA_real_),
+        event_status_3 = ifelse(is.na(event_time_3), 0, 1),
+    time_3 = ifelse(is.na(event_time_3), 36, event_time_3))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
@@ -949,21 +895,16 @@ merged_data <- merged_data %>%
     gc_category = case_when(
       rowSums(across(starts_with("cortisone_T"), ~ . > 0), na.rm = TRUE) == 0 ~ "None",
       rowSums(across(starts_with("cortisone_T"), ~ . > 0), na.rm = TRUE) <= 1 ~ "1",
-      TRUE ~ "More 1"
-    ),
+      TRUE ~ "More 1"),
     gc_category = factor(
       gc_category,
-      levels = c("None", "1", "More 1")
-    )
-  )
+      levels = c("None", "1", "More 1")))
 
 ggplot(merged_data, aes(x = gc_category)) +
   geom_bar(fill = "steelblue") +
   labs(
     x = "GC category",
-    y = "Number of patients"
-  ) +
-  theme_classic()
+    y = "Number of patients") + theme_classic()
 
 ######stacked durata
 #plot durata cortisone 
@@ -975,63 +916,26 @@ gc_long <- merged_data %>%
     cortisone_T18,
     cortisone_T24,
     cortisone_T30,
-    cortisone_T36
-  ) %>%
+    cortisone_T36) %>%
   pivot_longer(
     cols = starts_with("cortisone_T"),
     names_to = "Timepoint",
-    values_to = "Days"
-  ) %>%
-  mutate(
-    Timepoint = gsub("cortisone_", "", Timepoint),
-    Days = replace_na(Days, 0)
-  )
+    values_to = "Days") %>%
+  mutate(Timepoint = gsub("cortisone_", "", Timepoint), Days = replace_na(Days, 0))
 
-
-ggplot(gc_long,
-       aes(x = factor(ID),
+ggplot(gc_long, aes(x = factor(ID),
            y = Days,
            fill = Timepoint)) +
   geom_col(width = 0.8) +
-  geom_text(
-    aes(label = ifelse(Days > 0, Days, "")),
+  geom_text(aes(label = ifelse(Days > 0, Days, "")),
     position = position_stack(vjust = 0.5),
-    size = 3
-  ) +
+    size = 3) +
   labs(
     x = "Patient ID",
     y = "Days of corticosteroid treatment",
-    fill = "Timepoint"
-  ) +
+    fill = "Timepoint") +
   theme_classic() +
-  theme(
-    axis.text.x = element_text(angle = 90, hjust = 1)
-  )
-
-
-```
-
-Survival plot NEDA-3, stratified by glucocorticoid treatment during time:
-``` {r survival_gc_duration}
-
-
-```
-
-NEDA-3 divided by type of disease activity, stratified by Glucocorticoid treatment during time:
-1. EDSS
-``` {r survival_GC_during_EDSS}
-
-
-```
-
-2. Relapse
-``` {r survival_GC_during_relapse}
-
-
-```
-
-3. New lesions
-``` {r survival_GC_during_lesions}
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 ```
@@ -1069,10 +973,8 @@ merged_data$therapy_group <- factor(
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -1084,10 +986,8 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1098,10 +998,8 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1109,13 +1007,10 @@ merged_data_naive <- merged_data_naive %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_time_C = case_when(
@@ -1125,18 +1020,13 @@ merged_data_naive <- merged_data_naive %>%
       event_24_C ~ 24,
       event_30_C ~ 30,
       event_36_C ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data_naive$time_C,
-                 event = merged_data_naive$event_status_C)
+surv_obj <- Surv(time = merged_data_naive$time_C, event = merged_data_naive$event_status_C)
 
 fit <- survfit(surv_obj ~ therapy_group, data = merged_data_naive)
 
@@ -1167,16 +1057,13 @@ merged_data <- merged_data %>%
 
 merged_data$therapy_group <- factor(
   merged_data$therapy_group,
-  levels = c("MAV_change+", "MAV_change-")
-)
+  levels = c("MAV_change+", "MAV_change-"))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -1188,10 +1075,7 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1202,29 +1086,19 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Survival (solo EDSS)
-#=========================
 
+# Survival (solo EDSS)
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_status_EDSS = ifelse(EDSS_worsening, 1, 0),
-    time_EDSS = ifelse(EDSS_worsening, 6, 36)
-  )
+    time_EDSS = ifelse(EDSS_worsening, 6, 36))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
 surv_obj <- Surv(
-  time = merged_data_naive$time_EDSS,
-  event = merged_data_naive$event_status_EDSS
-)
+  time = merged_data_naive$time_EDSS, event = merged_data_naive$event_status_EDSS)
 
-fit <- survfit(
-  surv_obj ~ therapy_group,
-  data = merged_data_naive
-)
+fit <- survfit(surv_obj ~ therapy_group, data = merged_data_naive)
 
 ggsurvplot(
   fit,
@@ -1237,8 +1111,6 @@ ggsurvplot(
   xlab = "Months",
   ylab = "EDSS worsening-free survival"
 )
-
-
 
 ```
 
@@ -1261,8 +1133,7 @@ merged_data <- merged_data %>%
     event_18_2  = relapse_T18  == "Yes",
     event_24_2  = relapse_T24  == "Yes",
     event_30_2  = relapse_T30  == "Yes",
-    event_36_2  = relapse_T36  == "Yes"
-  )
+    event_36_2  = relapse_T36  == "Yes")
 
 merged_data <- merged_data %>%
   mutate(
@@ -1273,12 +1144,10 @@ merged_data <- merged_data %>%
       event_24_2  ~ 24,
       event_30_2  ~ 30,
       event_36_2  ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     
     event_status_2 = ifelse(is.na(event_time_2), 0, 1),
-    time_2 = ifelse(is.na(event_time_2), 36, event_time_2)
-  )
+    time_2 = ifelse(is.na(event_time_2), 36, event_time_2))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
@@ -1317,8 +1186,7 @@ merged_data <- merged_data %>%
     event_18_3  = lesioni_T18  == "Yes",
     event_24_3  = lesioni_T24  == "Yes",
     event_30_3  = lesioni_T30  == "Yes",
-    event_36_3  = lesioni_T36  == "Yes"
-  )
+    event_36_3  = lesioni_T36  == "Yes")
 
 merged_data <- merged_data %>%
   mutate(
@@ -1329,12 +1197,10 @@ merged_data <- merged_data %>%
       event_24_3  ~ 24,
       event_30_3  ~ 30,
       event_36_3  ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     
     event_status_3 = ifelse(is.na(event_time_3), 0, 1),
-    time_3 = ifelse(is.na(event_time_3), 36, event_time_3)
-  )
+    time_3 = ifelse(is.na(event_time_3), 36, event_time_3))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
@@ -1369,16 +1235,13 @@ merged_data <- merged_data %>%
 
 merged_data$gado_group <- factor(
   merged_data$gado_group,
-  levels = c("MAV Gadolinium +", "MAV Gadolinium -")
-)
+  levels = c("MAV Gadolinium +", "MAV Gadolinium -"))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -1390,10 +1253,8 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1404,10 +1265,8 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1415,13 +1274,10 @@ merged_data_naive <- merged_data_naive %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_time_C = case_when(
@@ -1434,15 +1290,11 @@ merged_data_naive <- merged_data_naive %>%
       TRUE ~ NA_real_
     ),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data_naive$time_C,
-                 event = merged_data_naive$event_status_C)
+surv_obj <- Surv(time = merged_data_naive$time_C, event = merged_data_naive$event_status_C)
 
 fit <- survfit(surv_obj ~ gado_group, data = merged_data_naive)
 
@@ -1456,9 +1308,6 @@ ggsurvplot(
     xlab = "Months",
   ylab = "NEDA-free survival"
 )
-
-
-
 
 ```
 
@@ -1476,16 +1325,13 @@ merged_data <- merged_data %>%
 
 merged_data$lesion_group <- factor(
   merged_data$lesion_group,
-  levels = c("MAV lesion_burden +", "MAV lesion_burden -")
-)
+  levels = c("MAV lesion_burden +", "MAV lesion_burden -"))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -1497,10 +1343,8 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1511,10 +1355,8 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1522,13 +1364,9 @@ merged_data_naive <- merged_data_naive %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
 # Tempo al primo evento
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_time_C = case_when(
@@ -1538,18 +1376,13 @@ merged_data_naive <- merged_data_naive %>%
       event_24_C ~ 24,
       event_30_C ~ 30,
       event_36_C ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data_naive$time_C,
-                 event = merged_data_naive$event_status_C)
+surv_obj <- Surv(time = merged_data_naive$time_C, event = merged_data_naive$event_status_C)
 
 fit <- survfit(surv_obj ~ lesion_group, data = merged_data_naive)
 
@@ -1580,16 +1413,13 @@ merged_data <- merged_data %>%
 
 merged_data$therapy_group <- factor(
   merged_data$therapy_group,
-  levels = c("MAV_change+", "MAV_change-")
-)
+  levels = c("MAV_change+", "MAV_change-"))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -1601,10 +1431,7 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1615,10 +1442,8 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1626,13 +1451,10 @@ merged_data_naive <- merged_data_naive %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_time_C = case_when(
@@ -1648,12 +1470,9 @@ merged_data_naive <- merged_data_naive %>%
     time_C = ifelse(is.na(event_time_C), 36, event_time_C)
   )
 
-#=========================
-# Kaplan-Meier
-#=========================
 
-surv_obj <- Surv(time = merged_data_naive$time_C,
-                 event = merged_data_naive$event_status_C)
+# Kaplan-Meier
+surv_obj <- Surv(time = merged_data_naive$time_C, event = merged_data_naive$event_status_C)
 
 fit <- survfit(surv_obj ~ spinal_group, data = merged_data_naive)
 
@@ -1684,16 +1503,13 @@ merged_data <- merged_data %>%
 
 merged_data$therapy_group <- factor(
   merged_data$sub_group,
-  levels = c("MAV subtentorial+", "MAV subtentorial-")
-)
+  levels = c("MAV subtentorial+", "MAV subtentorial-"))
 
 merged_data_naive <- merged_data %>%
   filter(naive != "No")
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data_naive <- merged_data_naive %>%
   rowwise() %>%
   mutate(
@@ -1705,10 +1521,8 @@ merged_data_naive <- merged_data_naive %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data_naive <- merged_data_naive %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1719,10 +1533,8 @@ merged_data_naive <- merged_data_naive %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1730,13 +1542,10 @@ merged_data_naive <- merged_data_naive %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data_naive <- merged_data_naive %>%
   mutate(
     event_time_C = case_when(
@@ -1749,15 +1558,11 @@ merged_data_naive <- merged_data_naive %>%
       TRUE ~ NA_real_
     ),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data_naive$time_C,
-                 event = merged_data_naive$event_status_C)
+surv_obj <- Surv(time = merged_data_naive$time_C, event = merged_data_naive$event_status_C)
 
 fit <- survfit(surv_obj ~ sub_group, data = merged_data_naive)
 
@@ -1771,8 +1576,6 @@ ggsurvplot(
     xlab = "Months",
   ylab = "NEDA-free survival"
 )
-
-
 
 
 
@@ -1793,10 +1596,7 @@ merged_data$therapy_group <- factor(
   levels = c("MAV subtentorial +", "MAV subtentorial -")
 )
 
-#=========================
 # Ultimo EDSS disponibile
-#=========================
-
 merged_data <- merged_data %>%
   rowwise() %>%
   mutate(
@@ -1808,10 +1608,7 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1822,10 +1619,8 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data <- merged_data %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1833,13 +1628,10 @@ merged_data <- merged_data %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_time_C = case_when(
@@ -1855,12 +1647,9 @@ merged_data <- merged_data %>%
     time_C = ifelse(is.na(event_time_C), 36, event_time_C)
   )
 
-#=========================
-# Kaplan-Meier
-#=========================
 
-surv_obj <- Surv(time = merged_data$time_C,
-                 event = merged_data$event_status_C)
+# Kaplan-Meier
+surv_obj <- Surv(time = merged_data$time_C, event = merged_data$event_status_C)
 
 fit <- survfit(surv_obj ~ sub_group, data = merged_data)
 
@@ -1874,19 +1663,16 @@ ggsurvplot(
   legend.title = "Groups",
   legend.labs= c("MAV subtentorial lesions -", "MAV subtentorial lesions +"),
     xlab = "Months",
-  ylab = "NEDA-free survival"
+  ylab = "NEDA-3 loss"
 )
-
 
 
 ```
 
 Survival plot NEDA-3, stratified by sex:
 ``` {r survival_sex}
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data <- merged_data %>%
   rowwise() %>%
   mutate(
@@ -1898,10 +1684,7 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -1912,10 +1695,8 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data <- merged_data %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -1923,13 +1704,10 @@ merged_data <- merged_data %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_time_C = case_when(
@@ -1939,18 +1717,13 @@ merged_data <- merged_data %>%
       event_24_C ~ 24,
       event_30_C ~ 30,
       event_36_C ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data$time_C,
-                 event = merged_data$event_status_C)
+surv_obj <- Surv(time = merged_data$time_C, event = merged_data$event_status_C)
 
 fit <- survfit(surv_obj ~ sex, data = merged_data)
 
@@ -1978,11 +1751,7 @@ merged_data <- merged_data %>%
     )
   )
 
-
-#=========================
 # Ultimo EDSS disponibile
-#=========================
-
 merged_data <- merged_data %>%
   rowwise() %>%
   mutate(
@@ -1994,10 +1763,8 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -2008,10 +1775,8 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data <- merged_data %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -2019,13 +1784,10 @@ merged_data <- merged_data %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_time_C = case_when(
@@ -2038,15 +1800,11 @@ merged_data <- merged_data %>%
       TRUE ~ NA_real_
     ),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data$time_C,
-                 event = merged_data$event_status_C)
+surv_obj <- Surv(time = merged_data$time_C, event = merged_data$event_status_C)
 
 fit <- survfit(surv_obj ~ median_age, data = merged_data)
 
@@ -2074,10 +1832,8 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data <- merged_data %>%
   rowwise() %>%
   mutate(
@@ -2089,10 +1845,8 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
-# Peggioramento EDSS
-#=========================
 
+# Peggioramento EDSS
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -2103,10 +1857,8 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
-# Eventi NEDA
-#=========================
 
+# Eventi NEDA
 merged_data <- merged_data %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -2114,13 +1866,10 @@ merged_data <- merged_data %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_time_C = case_when(
@@ -2130,18 +1879,13 @@ merged_data <- merged_data %>%
       event_24_C ~ 24,
       event_30_C ~ 30,
       event_36_C ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
-# Kaplan-Meier
-#=========================
 
-surv_obj <- Surv(time = merged_data$time_C,
-                 event = merged_data$event_status_C)
+#kaplan-meier
+surv_obj <- Surv(time = merged_data$time_C, event = merged_data$event_status_C)
 
 fit <- survfit(surv_obj ~ median_medas, data = merged_data)
 
@@ -2157,7 +1901,6 @@ ggsurvplot(
 )
 
 ```
-
 
 Survival plot NEDA-3, stratified by BMI median value (body max index):
 ``` {r survival_bmi}
@@ -2184,10 +1927,8 @@ merged_data$bmi_group <- factor(
   levels = c("MAV high bmi", "MAV low bmi")
 )
 
-#=========================
-# Ultimo EDSS disponibile
-#=========================
 
+# Ultimo EDSS disponibile
 merged_data <- merged_data %>%
   rowwise() %>%
   mutate(
@@ -2199,10 +1940,7 @@ merged_data <- merged_data %>%
   ) %>%
   ungroup()
 
-#=========================
 # Peggioramento EDSS
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     EDSS_worsening = case_when(
@@ -2213,10 +1951,7 @@ merged_data <- merged_data %>%
     )
   )
 
-#=========================
 # Eventi NEDA
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_6_C  = EDSS_worsening | relapse_T6  == "Yes" | lesioni_T6  == "Yes",
@@ -2224,13 +1959,10 @@ merged_data <- merged_data %>%
     event_18_C = EDSS_worsening | relapse_T18 == "Yes" | lesioni_T18 == "Yes",
     event_24_C = EDSS_worsening | relapse_T24 == "Yes" | lesioni_T24 == "Yes",
     event_30_C = EDSS_worsening | relapse_T30 == "Yes" | lesioni_T30 == "Yes",
-    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes"
-  )
+    event_36_C = EDSS_worsening | relapse_T36 == "Yes" | lesioni_T36 == "Yes")
 
-#=========================
+
 # Tempo al primo evento
-#=========================
-
 merged_data <- merged_data %>%
   mutate(
     event_time_C = case_when(
@@ -2240,18 +1972,13 @@ merged_data <- merged_data %>%
       event_24_C ~ 24,
       event_30_C ~ 30,
       event_36_C ~ 36,
-      TRUE ~ NA_real_
-    ),
+      TRUE ~ NA_real_),
     event_status_C = ifelse(is.na(event_time_C), 0, 1),
-    time_C = ifelse(is.na(event_time_C), 36, event_time_C)
-  )
+    time_C = ifelse(is.na(event_time_C), 36, event_time_C))
 
-#=========================
+
 # Kaplan-Meier
-#=========================
-
-surv_obj <- Surv(time = merged_data$time_C,
-                 event = merged_data$event_status_C)
+surv_obj <- Surv(time = merged_data$time_C, event = merged_data$event_status_C)
 
 fit <- survfit(surv_obj ~ bmi_group, data = merged_data)
 

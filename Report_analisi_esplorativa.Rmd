@@ -132,6 +132,186 @@ summary_table$All <- gsub("%", "\\\\%", summary_table$All)
 knitr::kable(summary_table, caption = "Cohort Summary Table")
 ```
 
+```{r summary_definitiva}
+library(gtsummary)
+library(gt)
+library(webshot2)
+Sys.setenv(CHROMOTE_CHROME = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe")
+
+tabella_gt <- merged_data %>%
+  select(
+    age_at_t0, sex, bmi, MEDAS, naive, EDSS_T0, gc_treatment,
+    lesion_burden, subtentorial_lesions, gadolinium_contrast,
+    bone_marrow_lesions, smoking_habit, physical_activity
+  ) %>%
+  mutate(
+    bmi = as.numeric(bmi),
+    EDSS_T0 = as.factor(EDSS_T0),
+    MEDAS = as.numeric(MEDAS),
+    # Ricodifica pulita delle variabili binarie: uniforma valori misti
+    # tipo "Yes"/"1" in un unico factor Yes/No, PRESERVANDO gli NA
+    # (case_when lascia NA_character_ per tutto cio' che non matcha
+    # esplicitamente Yes/No/1/0, cosi' i missing restano missing)
+    gc_treatment = factor(case_when(
+      gc_treatment %in% c("Yes", "1", 1, "Positive") ~ "Yes",
+      gc_treatment %in% c("No", "0", 0, "Negative")  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    subtentorial_lesions = factor(case_when(
+      subtentorial_lesions %in% c("Yes", "1", 1) ~ "Yes",
+      subtentorial_lesions %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    gadolinium_contrast = factor(case_when(
+      gadolinium_contrast %in% c("Yes", "1", 1) ~ "Yes",
+      gadolinium_contrast %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    bone_marrow_lesions = factor(case_when(
+      bone_marrow_lesions %in% c("Yes", "1", 1) ~ "Yes",
+      bone_marrow_lesions %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    lesion_burden = factor(case_when(
+      lesion_burden %in% c("Yes", "1", 1) ~ "Yes",
+      lesion_burden %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes"))
+  ) %>%
+  tbl_summary(
+    label = list(
+      age_at_t0 ~ "Age",
+      sex ~ "Sex",
+      bmi ~ "BMI",
+      MEDAS ~ "MEDAS",
+      naive ~ "Naive",
+      EDSS_T0 ~ "EDSS",
+      gc_treatment ~ "Glucocorticoid T0",
+      lesion_burden ~ "Lesion burden",
+      subtentorial_lesions ~ "Subtentorial lesions",
+      gadolinium_contrast ~ "Gadolinium contrast",
+      bone_marrow_lesions ~ "Spinal cord lesions",
+      smoking_habit ~ "Smoking habit",
+      physical_activity ~ "Physical activity"
+    ),
+    # Forza le variabili binarie a comparire su una sola riga (come naive),
+    # mostrando il conteggio dei "Yes"
+    type = list(
+      gc_treatment ~ "dichotomous",
+      subtentorial_lesions ~ "dichotomous",
+      gadolinium_contrast ~ "dichotomous",
+      bone_marrow_lesions ~ "dichotomous",
+      lesion_burden ~ "dichotomous"
+    ),
+    value = list(
+      gc_treatment ~ "Yes",
+      subtentorial_lesions ~ "Yes",
+      gadolinium_contrast ~ "Yes",
+      bone_marrow_lesions ~ "Yes",
+      lesion_burden ~ "Yes"
+    ),
+    missing_text = "Missing"
+  ) %>%
+  
+  modify_header(label ~ "**Variable**") %>%
+  bold_labels() %>%                      # <- bold SOLO sui nomi variabile, non sui livelli
+  as_gt() %>%
+  tab_header(
+    title = md("**Variables at T0 summary**")
+  )
+gtsave(tabella_gt, filename = "tabella_finale_MAV_only.png", zoom = 2)
+
+###########################################
+library(gtsummary)
+library(gt)
+library(webshot2)
+Sys.setenv(CHROMOTE_CHROME = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe")
+
+tabella_gt <- merged_data %>%
+  select(
+    age_at_t0, sex, bmi, MEDAS, naive, EDSS_T0, gc_treatment,
+    lesion_burden, subtentorial_lesions, gadolinium_contrast,
+    bone_marrow_lesions, smoking_habit, physical_activity
+  ) %>%
+  mutate(
+    bmi = as.numeric(bmi),
+    EDSS_T0 = droplevels(as.factor(EDSS_T0)), # <- Rimuove i livelli senza osservazioni (es. >= 5)
+    MEDAS = as.numeric(MEDAS),
+    # Ricodifica pulita delle variabili binarie: uniforma valori misti
+    # tipo "Yes"/"1" in un unico factor Yes/No, PRESERVANDO gli NA
+    # (case_when lascia NA_character_ per tutto cio' che non matcha
+    # esplicitamente Yes/No/1/0, cosi' i missing restano missing)
+    gc_treatment = factor(case_when(
+      gc_treatment %in% c("Yes", "1", 1, "Positive") ~ "Yes",
+      gc_treatment %in% c("No", "0", 0, "Negative")  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    subtentorial_lesions = factor(case_when(
+      subtentorial_lesions %in% c("Yes", "1", 1) ~ "Yes",
+      subtentorial_lesions %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    gadolinium_contrast = factor(case_when(
+      gadolinium_contrast %in% c("Yes", "1", 1) ~ "Yes",
+      gadolinium_contrast %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    bone_marrow_lesions = factor(case_when(
+      bone_marrow_lesions %in% c("Yes", "1", 1) ~ "Yes",
+      bone_marrow_lesions %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes")),
+    lesion_burden = factor(case_when(
+      lesion_burden %in% c("Yes", "1", 1) ~ "Yes",
+      lesion_burden %in% c("No", "0", 0)  ~ "No",
+      TRUE ~ NA_character_
+    ), levels = c("No", "Yes"))
+  ) %>%
+  tbl_summary(
+    label = list(
+      age_at_t0 ~ "Age",
+      sex ~ "Sex",
+      bmi ~ "BMI",
+      MEDAS ~ "MEDAS",
+      naive ~ "Naive",
+      EDSS_T0 ~ "EDSS",
+      gc_treatment ~ "Glucocorticoid T0",
+      lesion_burden ~ "Lesion burden",
+      subtentorial_lesions ~ "Subtentorial lesions",
+      gadolinium_contrast ~ "Gadolinium contrast",
+      bone_marrow_lesions ~ "Spinal cord lesions",
+      smoking_habit ~ "Smoking habit",
+      physical_activity ~ "Physical activity"
+    ),
+    # Forza le variabili binarie a comparire su una sola riga (come naive),
+    # mostrando il conteggio dei "Yes"
+    type = list(
+      gc_treatment ~ "dichotomous",
+      subtentorial_lesions ~ "dichotomous",
+      gadolinium_contrast ~ "dichotomous",
+      bone_marrow_lesions ~ "dichotomous",
+      lesion_burden ~ "dichotomous"
+    ),
+    value = list(
+      gc_treatment ~ "Yes",
+      subtentorial_lesions ~ "Yes",
+      gadolinium_contrast ~ "Yes",
+      bone_marrow_lesions ~ "Yes",
+      lesion_burden ~ "Yes"
+    ),
+    missing_text = "Missing"
+  ) %>%
+  
+  modify_header(label ~ "**Variable**") %>%
+  bold_labels() %>%                       # <- bold SOLO sui nomi variabile, non sui livelli
+  as_gt() %>%
+  tab_header(
+    title = md("**Variables at T0 summary**")
+  )
+
+gtsave(tabella_gt, filename = "tabella_finale_MAV_only.png", zoom = 2)
+
+```
 
 Summary graph of the distribution of the EDSS variable at time-point T0 in the cohort:
 
@@ -377,7 +557,7 @@ t.test(age_at_t0 ~ relapse_T24, data = merged_data)
 ```
 
 
-2. Age at T0 and lesions, positive and significant difference between groups on T6 an T12.
+2. Age at T0 and lesions, positive and no significant difference between groups on T6 an T12.
 
 ```{r age_vs_lesions}
 
@@ -385,6 +565,7 @@ t.test(age_at_t0 ~ relapse_T24, data = merged_data)
 t.test(age_at_t0 ~ lesioni_T6, data = merged_data) # correlazione SIGNIFICATIVA (di poco)
 t.test(age_at_t0 ~ lesioni_T12, data = merged_data) # correlazione SIGNIFICATIVA
 t.test(age_at_t0 ~ lesioni_T24, data = merged_data) # correlazione non significativa
+
 ```
 
 
@@ -431,6 +612,7 @@ merged_data %>%
 #subtentorial lesions
 wilcox.test(as.numeric(as.character(EDSS_T0)) ~ subtentorial_lesions, data = merged_data, exact = FALSE)
 wilcox.test(as.numeric(as.character(EDSS_T12)) ~ subtentorial_lesions, data = merged_data, exact = FALSE)
+
 ```
 
 
@@ -455,7 +637,7 @@ ggplot(merged_data,
   theme_minimal() +
   labs(title = "Glucocorticoid treatment before T0",x = "GC treatment", y = "EDSS T0")
 ```
-
+#da aggiornare con i nuovi dati mri
 Overall, no statistically significant associations were observed between EDSS and most clinical or lifestyle variables across time points. Notably, a significant positive association was observed between EDSS and bone marrow lesions, specifically at the T12 time-point. Additionally, glucocorticoid treatment showed a significant positive difference between groups at T0.
 Regarding age, while age at baseline was generally associated with higher EDSS values at later stages, a specific positive and significant difference was found between age at T0 and the presence of lesions at T12.
 Physical activity showed a potential trend, with more sedentary patients displaying a higher EDSS values over time, but the statistical tests are not significant. Although these results remain robust, it is important to consider that the findings at later time points may be partially influenced by missing data.

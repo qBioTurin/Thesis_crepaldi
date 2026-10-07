@@ -215,7 +215,6 @@ ggplot(edss_long, aes(x = time, y = EDSS_val, group = 1)) +
   theme_minimal() + labs(title="EDSS during time", x = "Time", y = "Median EDSS")
 
 # 2 ANDAMENTO PER SESSO 
-#Il gruppo maschile parte dal T6 al posto che dal T0?!?!?!?!?!!?
 ggplot(edss_long, aes(x = time, y = EDSS_val, color = sex, group = sex)) +
   stat_summary(fun = median, geom = "line", linewidth = 1.2, na.rm = TRUE) +
   stat_summary(fun = median, geom = "point", size = 3, na.rm = TRUE) +
@@ -249,9 +248,7 @@ wilcox.test(as.numeric(as.character(EDSS_T24)) ~ lesion_burden, data = merged_da
 
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(lesion_burden)) %>%
-  mutate(
-    EDSS_T0 = as.factor(EDSS_T0),
-    lesion_burden = factor(lesion_burden, labels = c("No", "Yes"))) %>%
+  mutate(EDSS_T0 = as.factor(EDSS_T0), lesion_burden = factor(lesion_burden, labels = c("No", "Yes"))) %>%
   ggplot(aes(x = lesion_burden, fill = EDSS_T0)) +
   geom_bar(position = "fill") + scale_y_continuous(labels = scales::percent) +
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by lesion burden", x = "Lesion burden", y = "Percentage", fill = "EDSS")
@@ -264,9 +261,7 @@ wilcox.test(as.numeric(as.character(EDSS_T24)) ~ bone_marrow_lesions, data = mer
 
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(bone_marrow_lesions)) %>%
-  mutate(
-    EDSS_T0 = as.factor(EDSS_T0),
-    bone_marrow_lesions = factor(bone_marrow_lesions, labels = c("No", "Yes"))) %>%
+  mutate(EDSS_T0 = as.factor(EDSS_T0), bone_marrow_lesions = factor(bone_marrow_lesions, labels = c("No", "Yes"))) %>%
   ggplot(aes(x = bone_marrow_lesions, fill = EDSS_T0)) +
   geom_bar(position = "fill") + scale_y_continuous(labels = scales::percent) +
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by bone marrow lesions", x = "Bone marrow lesions", y = "Percentage", fill = "EDSS")
@@ -280,9 +275,7 @@ wilcox.test(as.numeric(as.character(EDSS_T24)) ~ subtentorial_lesions, data = me
 
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(subtentorial_lesions)) %>%
-  mutate(
-    EDSS_T0 = as.factor(EDSS_T0),
-    subtentorial_lesions = factor(subtentorial_lesions, labels = c("No", "Yes"))) %>%
+  mutate(EDSS_T0 = as.factor(EDSS_T0),subtentorial_lesions = factor(subtentorial_lesions, labels = c("No", "Yes"))) %>%
   ggplot(aes(x = subtentorial_lesions, fill = EDSS_T0)) +
   geom_bar(position = "fill") + scale_y_continuous(labels = scales::percent) +
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by subtentorial_lesions", x = "Subtentorial_lesions", y = "Percentage", fill = "EDSS")
@@ -295,9 +288,7 @@ wilcox.test(as.numeric(as.character(EDSS_T24)) ~ gadolinium_contrast, data = mer
 
 merged_data %>%
   filter(!is.na(EDSS_T0), !is.na(gadolinium_contrast)) %>%
-  mutate(
-    EDSS_T0 = as.factor(EDSS_T0),
-    gadolinium_contrast = factor(gadolinium_contrast, labels = c("No", "Yes"))) %>%
+  mutate( EDSS_T0 = as.factor(EDSS_T0), gadolinium_contrast = factor(gadolinium_contrast, labels = c("No", "Yes"))) %>%
   ggplot(aes(x = gadolinium_contrast, fill = EDSS_T0)) +
   geom_bar(position = "fill") + scale_y_continuous(labels = scales::percent) +
   scale_fill_viridis_d(option = "mako") + theme_minimal() + labs(title = "EDSS_T0 by gadolinium_contrast", x = "Gadolinium_contrast", y = "Percentage", fill = "EDSS")

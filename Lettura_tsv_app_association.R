@@ -9,27 +9,27 @@ all_definitive_bacteria = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale
 
 significant_bacteria_prevalence_pvalue <- all_definitive_bacteria %>%
   filter(model == "prevalence", metadata == "tp",
-         pval_individual < 0.05)
+         pval_individual <= 0.05)
 
 #write.csv(significant_bacteria_prevalence_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_pvalue.csv", row.names = FALSE)
 
 
 significant_bacteria_prevalence_qvalue <- all_definitive_bacteria %>%
-  filter(model == "prevalence", metadata == "tp", qval_individual < 0.1)
+  filter(model == "prevalence", metadata == "tp", qval_individual<=0.1)
 
 #write.csv(significant_bacteria_prevalence_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_prevalence_qvalue.csv", row.names = FALSE)
 
 
 significant_bacteria_abundance_pvalue <- all_definitive_bacteria %>%
   filter(model == "abundance", metadata == "tp",
-         pval_individual < 0.05)
+         pval_individual<=0.05)
 
 #write.csv(significant_bacteria_abundance_pvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_Bacteria_abundance_pvalue.csv", row.names = FALSE)
 
 
 significant_bacteria_abundance_qvalue <- all_definitive_bacteria %>%
   filter(model == "abundance", metadata == "tp",
-         qval_individual < 0.1)
+         qval_individual<=0.1)
 
 #write.csv(significant_bacteria_abundance_qvalue, "C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\matrici_prev_abund\\Significant_bacteria_abundance_qvalue.csv", row.names = FALSE)
 
@@ -42,11 +42,8 @@ rds = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_
 metadata_df <- as(rds@sam_data, "data.frame")
 unique(metadata_df$tp)
 
-metadata_df$tp <- factor(
-  as.character(metadata_df$tp),
-  levels = c("T0", "T3", "T12", "T15", "T24", "T36"))
+metadata_df$tp <- factor(as.character(metadata_df$tp),levels = c("T0", "T3", "T12", "T15", "T24", "T36"))
 unique(metadata_df$tp)
-
 
 sig_species <- significant_bacteria_abundance_qvalue %>%
   filter(qval_individual < 0.1) %>%
@@ -56,8 +53,7 @@ sig_species <- significant_bacteria_abundance_qvalue %>%
 maaslin_transformed <- read.delim(
   "C:/Users/gialu/Desktop/tesi_magistrale/Analisi_pts_completi_app/Risultati_Maaslin/Risultati_MAV_app/risultati_maaslin_bacteria/features/data_transformed.tsv",
   row.names = 1,
-  check.names = FALSE
-)
+  check.names = FALSE)
 
 #alistipes onderdonkii
 sp <- "Alistipes_onderdonkii"
@@ -78,9 +74,8 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
- } else {
-  message("Specie non trovata: ", sp)
-}
+ }
+
 
 #eghertella lenta
 sp <- "Eggerthella_lenta"
@@ -95,14 +90,12 @@ if(sp %in% colnames(maaslin_transformed)){
       geom_jitter(width = 0.15, size = 2) +
       theme_bw() +
       labs(title = "Eggerthella lenta", 
-           subtitle = "Value: T12 -> Beta coefficient: -2.158 | qvalue: 0.044.    Value: T3 -> Beta coefficient: -1.723 | qvalue: 0.084",
+           subtitle = "Values: T12 -> Beta coefficient: -2.158 | qvalue: 0.044. and T3 -> Beta coefficient: -1.723 | qvalue: 0.084",
            tag = "Significant Abundance",
            x = "Timepoint", y = "MaAsLin3 transformed abundance: Log2(relative abundance)") ) +
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
 }
 
 #Parabacteroides_chongii
@@ -124,8 +117,6 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
 }
 
 #Collinsella_sp. i05-0019-G5
@@ -147,8 +138,6 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
 }
 
 #Gordonibacter_pamelaeae
@@ -170,8 +159,6 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
 }
 
 #Segatella_copri
@@ -193,9 +180,7 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
-}
+} 
 
 #Coprococcus_catus
 sp <- "Coprococcus_catus"
@@ -216,8 +201,6 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
 }
 
 #Bifidobacterium_angulatum
@@ -239,10 +222,7 @@ if(sp %in% colnames(maaslin_transformed)){
     theme(
       plot.tag = element_markdown(hjust = 1, size = 12),
       plot.tag.position = c(0.95, 0.98))
-} else {
-  message("Specie non trovata: ", sp)
-}
-
+} 
 
 
 
@@ -253,19 +233,19 @@ all_definitive_eukaryota = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistral
 
 significant_eukaryota_prevalence_pvalue <- all_definitive_eukaryota %>%
   filter(model == "prevalence", metadata == "tp",
-         pval_individual < 0.05)
+         pval_individual<=0.05)
 
 significant_eukaryota_prevalence_qvalue <- all_definitive_eukaryota %>%
   filter(model == "prevalence", metadata == "tp",
-         qval_individual < 0.1)
+         qval_individual<=0.1)
 
 significant_eukaryota_abundance_pvalue <- all_definitive_eukaryota %>%
   filter(model == "abundance", metadata == "tp",
-         pval_individual < 0.05)
+         pval_individual<=0.05)
 
 significant_eukaryota_abundance_qvalue <- all_definitive_eukaryota %>%
   filter(model == "abundance", metadata == "tp",
-         qval_individual < 0.1)
+         qval_individual<=0.1)
 ###########
 #Archaea
 ##########
@@ -273,19 +253,19 @@ all_definitive_archaea = read.delim("C:\\Users\\gialu\\Desktop\\tesi_magistrale\
 
 significant_archaea_prevalence_pvalue <- all_definitive_archaea %>%
   filter(model == "prevalence", metadata == "tp",
-         pval_individual < 0.05)
+         pval_individual<=0.05)
 
 significant_archaea_prevalence_qvalue <- all_definitive_archaea %>%
   filter(model == "prevalence", metadata == "tp",
-         qval_individual < 0.1)
+         qval_individual<=0.1)
 
 significant_archaea_abundance_pvalue <- all_definitive_archaea %>%
   filter(model == "abundance", metadata == "tp",
-         pval_individual < 0.05)
+         pval_individual<=0.05)
 
 significant_archaea_abundance_qvalue <- all_definitive_archaea %>%
   filter(model == "abundance", metadata == "tp",
-         qval_individual < 0.1)
+         qval_individual<=0.1)
 
 #lettura numero di taxa / taxa table
 numero_taxa_bacteria = readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_MAV_app\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
@@ -308,8 +288,7 @@ ggplot(significant_bacteria_prevalence_pvalue,
                    yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_p),
+  geom_point(aes(x = coef, color = neg_log10_p),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -322,7 +301,6 @@ ggplot(significant_bacteria_prevalence_pvalue,
     y = "Species",
     title = "Significant Bacteria prevalence (pvalue)"
   ) +
-  
   theme_classic()
 
 
@@ -337,8 +315,7 @@ ggplot(significant_bacteria_abundance_pvalue,
                    yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_p),
+  geom_point(aes(x = coef, color = neg_log10_p),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -351,7 +328,6 @@ ggplot(significant_bacteria_abundance_pvalue,
     y = "Species",
     title = "Significant Bacteria abundance (pvalue)"
   ) +
-  
   theme_classic()
 
 
@@ -359,15 +335,14 @@ ggplot(significant_bacteria_abundance_pvalue,
 significant_bacteria_abundance_qvalue$neg_log10_q <- -log10(significant_bacteria_abundance_qvalue$qval_individual)
 max_abs_coef <- max(abs(significant_bacteria_abundance_qvalue$coef), na.rm = TRUE)
 
-ggplot(significant_bacteria_abundance_qvalue,
+summary_abundance_qvalue_batteri = ggplot(significant_bacteria_abundance_qvalue,
        aes(y = reorder(feature, -qval_individual))) +
   geom_segment(aes(x = 0,
                    xend = coef,
                    yend = reorder(feature, -qval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_q),
+  geom_point(aes(x = coef,   color = neg_log10_q),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -378,10 +353,12 @@ ggplot(significant_bacteria_abundance_qvalue,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Bacteria abundance (qvalue)"
+    title = "Bacterial species statistically significant for abundance (q-value)"
   ) +
-  theme_classic()
-
+  theme_classic()+ theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+                         axis.text.y = element_text(size = 13))
+print(summary_abundance_qvalue_batteri)
+ggsave("summary_bacteria_qvalue_abundance.jpeg", summary_abundance_qvalue_batteri, width = 12, height = 8, dpi = 300)
 
 #eukaryota prevalence qvalue NO!!!
 #eukaryota abundance qvalue 
@@ -395,8 +372,7 @@ ggplot(significant_eukaryota_abundance_qvalue,
                    yend = reorder(feature, -qval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_q),
+  geom_point(aes(x = coef, color = neg_log10_q),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -407,17 +383,17 @@ ggplot(significant_eukaryota_abundance_qvalue,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Eukaryota abundance (qvalue)"
+    title = "Eukaryotic species statistically significant for abundance (qvalue)"
   ) +
   theme_classic()
+
 #eukaryota abundance pvalue
 significant_eukaryota_abundance_pvalue$neg_log10_p <- -log10(significant_eukaryota_abundance_pvalue$pval_individual)
 max_abs_coef <- max(abs(significant_eukaryota_abundance_pvalue$coef), na.rm = TRUE)
 ggplot(significant_eukaryota_abundance_pvalue,
        aes(y = reorder(feature, -pval_individual))) +
   geom_segment(aes(x = 0,
-                   xend = coef,
-                   yend = reorder(feature, -pval_individual)),
+                   xend = coef, yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
   geom_point(aes(x = coef,
@@ -432,9 +408,7 @@ ggplot(significant_eukaryota_abundance_pvalue,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Eukaryota abundance (pvalue)"
-  ) +
-  
+    title = "Significant Eukaryota abundance (pvalue)") +
   theme_classic()
 
 #archaea prevalence pvalue e qvalue NO!!!
@@ -449,8 +423,7 @@ ggplot(significant_archaea_abundance_qvalue,
                    yend = reorder(feature, -qval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_q),
+  geom_point(aes(x = coef, color = neg_log10_q),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -461,17 +434,16 @@ ggplot(significant_archaea_abundance_qvalue,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Archaea abundance (qvalue)"
-  ) +
+    title = "Significant Archaea abundance (qvalue)") +
   theme_classic()
+
 #archaea abundance pvalue
 significant_archaea_abundance_pvalue$neg_log10_p <- -log10(significant_archaea_abundance_pvalue$pval_individual)
 max_abs_coef <- max(abs(significant_archaea_abundance_pvalue$coef), na.rm = TRUE)
 ggplot(significant_archaea_abundance_pvalue,
        aes(y = reorder(feature, -pval_individual))) +
   geom_segment(aes(x = 0,
-                   xend = coef,
-                   yend = reorder(feature, -pval_individual)),
+                   xend = coef, yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
   geom_point(aes(x = coef,
@@ -486,9 +458,7 @@ ggplot(significant_archaea_abundance_pvalue,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Archaea abundance (pvalue)"
-  ) +
-  
+    title = "Significant Archaea abundance (pvalue)") +
   theme_classic()
 
 ###############---------###############################################------------------------------------###########
@@ -571,8 +541,7 @@ ggplot(significant_bacteria_abundance_pvalue_h,
                    yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_p),
+  geom_point(aes(x = coef, color = neg_log10_p),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -582,10 +551,7 @@ ggplot(significant_bacteria_abundance_pvalue_h,
   scale_x_continuous(limits = c(-max_abs_coef, max_abs_coef)) +
   labs(
     x = "Beta coefficient",
-    y = "Species",
-    title = "Significant Bacteria abundance (pvalue)"
-  ) +
-  
+    y = "Species", title = "Bacterial species statistically significant for abundance (p-value)") +
   theme_classic()
 
 #batteri prevalence pval
@@ -598,8 +564,7 @@ ggplot(significant_bacteria_prevalence_pvalue_h,
                    yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_p),
+  geom_point(aes(x = coef,  color = neg_log10_p),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -610,9 +575,7 @@ ggplot(significant_bacteria_prevalence_pvalue_h,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Bacteria prevalence (pvalue)"
-  ) +
-  
+    title = "Bacterial species statistically significant for prevalence (p-value)") +
   theme_classic()
 
 
@@ -629,8 +592,7 @@ ggplot(significant_eukaryota_prevalence_pvalue_h,
                    yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_p),
+  geom_point(aes(x = coef,  color = neg_log10_p),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -641,9 +603,7 @@ ggplot(significant_eukaryota_prevalence_pvalue_h,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Eukaryota prevalence (pvalue)"
-  ) +
-  
+    title = "Significant Eukaryota prevalence (pvalue)") +
   theme_classic()
 
 
@@ -657,8 +617,7 @@ max_abs_coef <- max(abs(significant_eukaryota_abundance_qvalue_h$coef), na.rm = 
 ggplot(significant_eukaryota_abundance_qvalue_h,
        aes(y = reorder(feature, -qval_individual))) +
   geom_segment(aes(x = 0,
-                   xend = coef,
-                   yend = reorder(feature, -qval_individual)),
+                   xend = coef, yend = reorder(feature, -qval_individual)),
                color = "grey70",
                linewidth = 0.8) +
   geom_point(aes(x = coef,
@@ -673,8 +632,7 @@ ggplot(significant_eukaryota_abundance_qvalue_h,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Bacteria abundance (qvalue)"
-  ) +
+    title = "Significant Bacteria abundance (qvalue)") +
   theme_classic()
 
 
@@ -689,8 +647,7 @@ ggplot(significant_eukaryota_abundance_pvalue_h,
                    yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
-  geom_point(aes(x = coef,
-                 color = neg_log10_p),
+  geom_point(aes(x = coef, color = neg_log10_p),
              size = 4) +
   geom_vline(xintercept = 0,
              linetype = "dashed",
@@ -701,9 +658,7 @@ ggplot(significant_eukaryota_abundance_pvalue_h,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Eukaryota abundance (pvalue)"
-  ) +
-  
+    title = "Significant Eukaryota abundance (pvalue)") +
   theme_classic()
 
 #archaea prevalence qvalue NO!!!
@@ -715,8 +670,7 @@ max_abs_coef <- max(abs(significant_archaea_prevalence_pvalue_h$coef), na.rm = T
 ggplot(significant_archaea_prevalence_pvalue_h,
        aes(y = reorder(feature, -pval_individual))) +
   geom_segment(aes(x = 0,
-                   xend = coef,
-                   yend = reorder(feature, -pval_individual)),
+                   xend = coef, yend = reorder(feature, -pval_individual)),
                color = "grey70",
                linewidth = 0.8) +
   geom_point(aes(x = coef,
@@ -731,104 +685,6 @@ ggplot(significant_archaea_prevalence_pvalue_h,
   labs(
     x = "Beta coefficient",
     y = "Species",
-    title = "Significant Archaea prevalence (pvalue)"
-  ) +
-  
+    title = "Significant Archaea prevalence (pvalue)") +
   theme_classic()
-
-
-
-
-
-############################################################################
-##heatmap sani vs malati
-###############################################
-#batteri
-
-#abundance
-# Carica il phyloseq
-physeq <- readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
-
-
-#==========================
-# Estrai la tassonomia
-#==========================
-tax_df <- as.data.frame(tax_table(physeq))
-
-# Crea il nome delle feature come in MaAsLin3
-tax_df$feature <- paste(tax_df$Genus, tax_df$Species, sep = "_")
-
-#==========================
-# Specie significative
-#==========================
-species_sig <- unique(significant_bacteria_abundance_pvalue_h$feature)
-
-#==========================
-# Trova i taxa da mantenere
-#==========================
-taxa_keep <- rownames(tax_df)[tax_df$feature %in% species_sig]
-
-cat(length(taxa_keep), "specie trovate\n")
-
-#==========================
-# Filtra il phyloseq
-#==========================
-physeq_sig_abundance <- prune_taxa(taxa_keep, physeq)
-
-# Controllo
-physeq_sig_abundance
-ntaxa(physeq_sig_abundance)
-
-#==========================
-# Salva il nuovo phyloseq
-#==========================
-saveRDS(
-  physeq_sig_abundance,
-  "C:/Users/gialu/Desktop/tesi_magistrale/physeq_sig_abundance.rds"
-)
-
-###poi carico questo sull'app nella sezione DAS
-
-###########prevalence
-# Carica il phyloseq
-physeq <- readRDS("C:\\Users\\gialu\\Desktop\\tesi_magistrale\\Analisi_pts_completi_app\\Risultati_Maaslin\\Risultati_app_healty_plus_MAV\\shared_results\\SUPERVISED_DEC\\Bacteria_Supervised_decontam.rds")
-
-
-#==========================
-# Estrai la tassonomia
-#==========================
-tax_df <- as.data.frame(tax_table(physeq))
-
-# Crea il nome delle feature come in MaAsLin3
-tax_df$feature <- paste(tax_df$Genus, tax_df$Species, sep = "_")
-
-#==========================
-# Specie significative
-#==========================
-species_sig <- unique(significant_bacteria_prevalence_pvalue_h$feature)
-
-#==========================
-# Trova i taxa da mantenere
-#==========================
-taxa_keep <- rownames(tax_df)[tax_df$feature %in% species_sig]
-
-cat(length(taxa_keep), "specie trovate\n")
-
-#==========================
-# Filtra il phyloseq
-#==========================
-physeq_sig_prevalence <- prune_taxa(taxa_keep, physeq)
-
-# Controllo
-physeq_sig_prevalence
-ntaxa(physeq_sig_prevalence)
-
-#==========================
-# Salva il nuovo phyloseq
-#==========================
-saveRDS(
-  physeq_sig_prevalence,
-  "C:/Users/gialu/Desktop/tesi_magistrale/physeq_sig_prevalence.rds"
-)
-
 
