@@ -32,5 +32,6 @@ library(cowplot)
 library(scales)
 library(ggtext)
 library(patchwork)
+library(qqman)
 
 sessionInfo()
